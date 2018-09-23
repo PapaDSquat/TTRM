@@ -106,11 +106,21 @@ void ABoard::MoveDown()
 void ABoard::RotateCW()
 {
 	m_activeTetromino->RotateCW();
+
+	if (!TryMoveTetromino(FIntPoint::ZeroValue))
+	{
+		m_activeTetromino->RotateCCW();
+	}
 }
 
 void ABoard::RotateCCW()
 {
 	m_activeTetromino->RotateCCW();
+
+	if (!TryMoveTetromino(FIntPoint::ZeroValue))
+	{
+		m_activeTetromino->RotateCW();
+	}
 }
 
 void ABoard::Drop()
@@ -189,16 +199,49 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 	{
 		TileData& tileData = m_grid[pos.X][pos.Y];
 
-		tileData.filled = 1;
-		tileData.block->SetActorHiddenInGame(false);
-		//tileData.block->
+		SetTileFilled(posX, pos.Y, true);
+		// TODO: Copy texture and other data
 
-		minRow = FMath::Min(minRow, pos.Y);
-		maxRow = FMath::Max(maxRow, pos.Y);
+		minRow = FMath::Min(minRow, pos.X);
+		maxRow = FMath::Max(maxRow, pos.X);
 	}
 
-	// TODO Try to clear any rows affected
-	
+	// Try to clear any rows affected
+	// For now parse from top down, moving one row down at a time
+	// TODO: Optimize
+	for (int32 row = minRow; row <= maxRow; ++row)
+	{
+		bool rowFilled = true;
+		for (int32 col = 0; col < s_gridCols; ++col)
+		{
+			if (!m_grid[row][col].filled)
+			{
+				rowFilled = false;
+				break;
+			}
+		}
+
+		if (rowFilled)
+		{
+			// Copy data from above line
+			for (int32 col = 0; col < s_gridCols; ++col)
+			{
+				for (int32 boardRow = row; boardRow >= 0; --boardRow)
+				{
+					TileData& currentTile = m_grid[boardRow][col];
+					if (boardRow == 0)
+					{
+						SetTileFilled(boardRow, col, false);
+						continue;
+					}
+
+					const TileData& aboveTile = m_grid[boardRow - 1][col];
+					SetTileFilled(boardRow, col, aboveTile.filled);
+				}
+			}
+			
+		}
+	}
 }
 
 void ABoard::PlaceBlocks(const FIntPoint& position)
@@ -209,6 +252,13 @@ void ABoard::PlaceBlocks(const FIntPoint& position)
 		localPos += position;
 	}
 	PlaceBlocks(localGridPositions);
+}
+
+void ABoard::SetTileFilled(uint8 row, uint8 col, bool filled)
+{
+	TileData& currentTile = m_grid[row][col];
+	currentTile.filled = filled;
+	currentTile.block->SetActorHiddenInGame(!filled);
 }
 
 FBox2D ABoard::GetActiveBounds() const
