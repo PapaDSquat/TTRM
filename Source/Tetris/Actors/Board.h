@@ -46,7 +46,7 @@ private:
 
 	void PlaceBlocks(const TArray< FIntPoint >& positions );
 	void PlaceBlocks(const FIntPoint& position);
-	void SetTileFilled(bool filled);
+	void SetTileFilled(uint8 row, uint8 col, bool filled);
 
 	FBox2D GetActiveBounds() const;
 

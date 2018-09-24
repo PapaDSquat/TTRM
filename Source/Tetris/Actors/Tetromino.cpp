@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Tetromino.h"
-#include "Block.h"
 
 const uint8 ATetromino::s_totalBlocks;
 const uint8 ATetromino::s_maxGridSize;
@@ -19,9 +18,13 @@ void ATetromino::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (Themes.Num() == 0)
+	{
+		Themes.Push(FBlockTheme()); // Create default theme
+	}
+
 	SpawnBlocks();
-	SetType(GetRandomType());
-	SetRotation(GetRandomRotation());
+	Randomize();
 }
 
 // Called every frame
@@ -45,6 +48,7 @@ void ATetromino::RotateCCW()
 
 void ATetromino::Randomize()
 {
+	SetTheme(GetRandomTheme());
 	SetType(GetRandomType());
 	SetRotation(GetRandomRotation());
 }
@@ -68,7 +72,6 @@ FBox2D ATetromino::GetBounds() const
 
 FIntPoint ATetromino::GetRealSize() const
 {
-	
 	FIntPoint size( 0,0 );
 	const auto& rotation = m_rotations[m_rotationIndex];
 	for (const auto& position : rotation.m_positions)
@@ -79,6 +82,27 @@ FIntPoint ATetromino::GetRealSize() const
 	return size;
 }
 
+void ATetromino::SetIsShadow(bool isShadow)
+{
+	// TODO
+	m_isShadow = isShadow;
+}
+
+const FBlockTheme& ATetromino::GetTheme() const
+{
+	return m_theme;
+}
+
+void ATetromino::SetTheme(const FBlockTheme& theme)
+{
+	m_theme = theme;
+
+	for (uint8 i = 0; i < s_totalBlocks; ++i)
+	{
+		m_blocks[i]->SetTheme(m_theme);
+	}
+}
+
 ETetrominoType ATetromino::GetRandomType()
 {
 	return (ETetrominoType)FMath::RandRange(0, (int32)ETetrominoType::Count - 1);;
@@ -87,6 +111,11 @@ ETetrominoType ATetromino::GetRandomType()
 uint8 ATetromino::GetRandomRotation()
 {
 	return FMath::RandRange(0, s_rotations - 1);
+}
+
+FBlockTheme ATetromino::GetRandomTheme()
+{
+	return Themes[ FMath::RandRange(0, Themes.Num() - 1) ];
 }
 
 void ATetromino::SpawnBlocks()

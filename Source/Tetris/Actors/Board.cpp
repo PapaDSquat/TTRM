@@ -199,7 +199,7 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 	{
 		TileData& tileData = m_grid[pos.X][pos.Y];
 
-		SetTileFilled(posX, pos.Y, true);
+		SetTileFilled(pos.X, pos.Y, true);
 		// TODO: Copy texture and other data
 
 		minRow = FMath::Min(minRow, pos.X);
@@ -228,6 +228,8 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 			{
 				for (int32 boardRow = row; boardRow >= 0; --boardRow)
 				{
+					// TODO: Copy tile data instead
+
 					TileData& currentTile = m_grid[boardRow][col];
 					if (boardRow == 0)
 					{
@@ -259,6 +261,7 @@ void ABoard::SetTileFilled(uint8 row, uint8 col, bool filled)
 	TileData& currentTile = m_grid[row][col];
 	currentTile.filled = filled;
 	currentTile.block->SetActorHiddenInGame(!filled);
+	currentTile.block->SetTheme(m_activeTetromino->GetTheme());
 }
 
 FBox2D ABoard::GetActiveBounds() const

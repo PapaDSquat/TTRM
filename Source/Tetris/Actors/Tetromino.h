@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Block.h"
 #include "Tetromino.generated.h"
 
 class ABlock;
@@ -50,8 +51,14 @@ public:
 	FBox2D GetBounds() const;
 	FIntPoint GetRealSize() const;
 
+	void SetIsShadow(bool isShadow);
+
+	const FBlockTheme& GetTheme() const;
+	void SetTheme(const FBlockTheme& theme);
+
 	static ETetrominoType GetRandomType();
 	static uint8 GetRandomRotation();
+	FBlockTheme GetRandomTheme();
 
 private:
 	struct RotationConfig
@@ -80,7 +87,20 @@ private:
 	static const uint8 s_totalBlocks = 4;
 	ABlock* m_blocks[s_totalBlocks];
 
+	FBlockTheme m_theme;
+	
+	bool m_isShadow{ false };
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Block")
 	TSubclassOf<ABlock> BlockClass;
+
+	UPROPERTY(EditAnywhere, AdvancedDisplay, Category = "Block")
+	TArray< FBlockTheme > Themes;
+
+	//UPROPERTY(EditAnywhere, Category = "Block")
+	//TArray< UMaterial* > AllMaterials;
+	//
+	//UPROPERTY(EditAnywhere, Category = "Block")
+	//UMaterial* ShadowMaterial;
 };
