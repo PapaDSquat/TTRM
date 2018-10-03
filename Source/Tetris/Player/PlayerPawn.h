@@ -28,12 +28,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	
-
 private:
 	ABoard* m_board;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Tetris Actors")
 	TSubclassOf<ABoard> BoardClass;
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	ABoard* GetBoard() const { return m_board; }
 };

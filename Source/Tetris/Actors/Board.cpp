@@ -46,15 +46,19 @@ void ABoard::BeginPlay()
 	}
 
 	{
-		// Spawn Active Tetromino
+		// Spawn Tetrominos
 		FVector location(0.0f, 0.0f, 0.0f);
 		FRotator rotation(0.0f, 0.0f, 0.0f);
+		FAttachmentTransformRules attachRules(EAttachmentRule::KeepRelative, false);
 		FActorSpawnParameters spawnInfo;
 		spawnInfo.Owner = this;
-		m_activeTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 
-		FAttachmentTransformRules attachRules(EAttachmentRule::KeepRelative, false);
+		m_activeTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 		m_activeTetromino->AttachToActor(this, attachRules);
+
+		m_ghostTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+		m_ghostTetromino->AttachToActor(this, attachRules);
+		m_ghostTetromino->SetIsShadow(true);
 	}
 
 
@@ -111,6 +115,8 @@ void ABoard::RotateCW()
 	{
 		m_activeTetromino->RotateCCW();
 	}
+
+	UpdateGhost();
 }
 
 void ABoard::RotateCCW()
@@ -121,6 +127,8 @@ void ABoard::RotateCCW()
 	{
 		m_activeTetromino->RotateCW();
 	}
+
+	UpdateGhost();
 }
 
 void ABoard::Drop()
@@ -180,14 +188,33 @@ bool ABoard::TryMoveTetromino(const FIntPoint& offset)
 
 void ABoard::RepositionActiveTetromino()
 {
-	const FVector location(m_activePosition.Y * 100.f, 0.f, -m_activePosition.X * 100.f);
-	m_activeTetromino->SetActorRelativeLocation(location);
+	{
+		const FVector location(m_activePosition.Y * 100.f, 0.f, -m_activePosition.X * 100.f);
+		m_activeTetromino->SetActorRelativeLocation(location);
+	}
+
+	{
+		// Find ghost position
+		FIntPoint offset = FIntPoint(s_gridRows - m_activePosition.X, 0);
+		
+		do 
+		{
+			--offset.X;
+		}
+		while (!TryMoveTetromino(offset));
+
+		const FIntPoint ghostPosition = m_activePosition + offset;
+		const FVector location(ghostPosition.Y * 100.f, 0.f, -ghostPosition.X * 100.f);
+		m_ghostTetromino->SetActorRelativeLocation(location);
+		UpdateGhost();
+	}
 }
 
 void ABoard::SpawnNewTetromino()
 {
 	m_activeTetromino->Randomize();
 	m_activePosition.X = m_activePosition.Y = 0;
+
 	RepositionActiveTetromino();
 }
 
@@ -209,6 +236,8 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 	// Try to clear any rows affected
 	// For now parse from top down, moving one row down at a time
 	// TODO: Optimize
+
+	int8 numLines = 0;
 	for (int32 row = minRow; row <= maxRow; ++row)
 	{
 		bool rowFilled = true;
@@ -241,9 +270,24 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 					SetTileFilled(boardRow, col, aboveTile.filled);
 				}
 			}
-			
+			++numLines;
 		}
 	}
+
+	// TODO: Move out of here, add level and score multiplier
+	int32 score = 0;
+	switch (numLines)
+	{
+	case 1: score = 40; break;
+	case 2: score = 100; break;
+	case 3: score = 300; break;
+	case 4: score = 1200; break;
+	}
+
+	Lines += numLines;
+	Score += score;
+
+	m_scoreEvent.Broadcast(Lines, Score);
 }
 
 void ABoard::PlaceBlocks(const FIntPoint& position)
@@ -271,5 +315,10 @@ FBox2D ABoard::GetActiveBounds() const
 	
 	bounds += FBox2D(activePos, activePos);
 	return bounds;
+}
+
+void ABoard::UpdateGhost()
+{
+	m_activeTetromino->CopyConfig(m_ghostTetromino);
 }
 

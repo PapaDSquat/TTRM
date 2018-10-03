@@ -31,8 +31,6 @@ public:
 	// Sets default values for this actor's properties
 	ATetromino();
 
-	void SetType(ETetrominoType type);
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,11 +44,13 @@ public:
 	void RotateCCW();
 
 	void Randomize();
+	void CopyConfig(ATetromino* other) const;
 
 	const TArray< FIntPoint >& GetGridPositions() const;
 	FBox2D GetBounds() const;
 	FIntPoint GetRealSize() const;
 
+	void SetType(ETetrominoType type);
 	void SetIsShadow(bool isShadow);
 
 	const FBlockTheme& GetTheme() const;
@@ -75,6 +75,8 @@ private:
 	void PositionBlocks(const RotationConfig& config);
 
 	void SetRotation(uint8 index);
+
+	ETetrominoType m_type{ ETetrominoType::Count };
 
 	static const uint8 s_maxGridSize = 4;
 	uint8 m_grid[s_maxGridSize][s_maxGridSize];

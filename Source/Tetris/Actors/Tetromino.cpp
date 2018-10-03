@@ -97,6 +97,11 @@ void ATetromino::SetTheme(const FBlockTheme& theme)
 {
 	m_theme = theme;
 
+	if (m_isShadow)
+	{
+		m_theme.Opacity = 0.30f; // TODO: Parametrize
+	}
+
 	for (uint8 i = 0; i < s_totalBlocks; ++i)
 	{
 		m_blocks[i]->SetTheme(m_theme);
@@ -163,8 +168,17 @@ void ATetromino::SetRotation(uint8 index)
 	}
 }
 
+void ATetromino::CopyConfig(ATetromino* other) const
+{
+	other->SetTheme(m_theme);
+	other->SetType(m_type);
+	other->SetRotation(m_rotationIndex);
+}
+
 void ATetromino::SetType(ETetrominoType type)
 {
+	m_type = type;
+
 	switch (type)
 	{
 	case ETetrominoType::I:
