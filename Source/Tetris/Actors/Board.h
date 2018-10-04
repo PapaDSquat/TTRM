@@ -8,6 +8,7 @@
 
 class ABlock;
 class ATetromino;
+class ATetrisGameMode;
 
 UCLASS()
 class TETRIS_API ABoard : public AActor
@@ -34,9 +35,13 @@ public:
 	void RotateCCW();
 	void Drop();
 
-	
-
 private:
+	struct TileData
+	{
+		bool filled;
+		ABlock* block;
+	};
+
 	void OnDescendTimer();
 
 	void SetActivePosition(const FIntPoint& newPosition);
@@ -48,6 +53,8 @@ private:
 
 	void PlaceBlocks(const TArray< FIntPoint >& positions );
 	void PlaceBlocks(const FIntPoint& position);
+
+	void CopyTile(const TileData& source, TileData& dest) const;
 	void SetTileFilled(uint8 row, uint8 col, bool filled);
 
 	FBox2D GetActiveBounds() const;
@@ -56,11 +63,6 @@ private:
 
 	static const uint8 s_gridRows = 24;
 	static const uint8 s_gridCols = 10;
-	struct TileData
-	{
-		bool filled;
-		ABlock* block;
-	};
 	TileData m_grid[s_gridRows][s_gridCols];
 
 	ATetromino* m_activeTetromino;
@@ -69,15 +71,7 @@ private:
 
 	FTimerHandle m_dropTimerHandle;
 
-	//==================
-	// Events
-public:
-	// TODO: Change to a struct of score data
-	DECLARE_EVENT_TwoParams(ABoard, FScoreEvent, int32, int32)
-	FScoreEvent& OnScoreEvent() { return m_scoreEvent; }
-
-private:
-	FScoreEvent m_scoreEvent;
+	ATetrisGameMode* m_gameMode;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Tetris Setup")
@@ -85,17 +79,4 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Tetris Setup")
 	TSubclassOf<ABlock> BlockClass;
-
-	// TODO: Move out of here
-	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
-	int32 Lines;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
-	int32 Score;
-
-	UFUNCTION(BlueprintCallable, Category = "Tetris")
-	int32 GetLines() const { return Lines; }
-
-	UFUNCTION(BlueprintCallable, Category = "Tetris")
-	int32 GetScore() const { return Score; }
 };

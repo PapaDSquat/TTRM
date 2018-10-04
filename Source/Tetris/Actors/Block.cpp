@@ -37,6 +37,11 @@ void ABlock::Tick(float DeltaTime)
 
 }
 
+const FBlockTheme& ABlock::GetTheme() const
+{
+	return m_theme;
+}
+
 void ABlock::SetTheme(const FBlockTheme& theme)
 {
 	m_theme = theme;

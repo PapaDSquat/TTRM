@@ -99,7 +99,7 @@ void ATetromino::SetTheme(const FBlockTheme& theme)
 
 	if (m_isShadow)
 	{
-		m_theme.Opacity = 0.30f; // TODO: Parametrize
+		m_theme.Opacity = 0.50f; // TODO: Parametrize
 	}
 
 	for (uint8 i = 0; i < s_totalBlocks; ++i)

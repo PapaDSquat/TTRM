@@ -4,6 +4,7 @@
 
 #include "../Actors/Block.h"
 #include "../Actors/Tetromino.h"
+#include "../GameMode/TetrisGameMode.h"
 
 
 const uint8 ABoard::s_gridRows;
@@ -21,6 +22,8 @@ void ABoard::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	m_gameMode = (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
+
 	// Init board
 	for (uint8 r = 0; r < s_gridRows; ++r)
 	{
@@ -213,7 +216,8 @@ void ABoard::RepositionActiveTetromino()
 void ABoard::SpawnNewTetromino()
 {
 	m_activeTetromino->Randomize();
-	m_activePosition.X = m_activePosition.Y = 0;
+	m_activePosition.X = 0;
+	m_activePosition.Y = ( s_gridCols / 2 ) - 1;
 
 	RepositionActiveTetromino();
 }
@@ -267,27 +271,17 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 					}
 
 					const TileData& aboveTile = m_grid[boardRow - 1][col];
-					SetTileFilled(boardRow, col, aboveTile.filled);
+					CopyTile(aboveTile, currentTile);
 				}
 			}
 			++numLines;
 		}
 	}
 
-	// TODO: Move out of here, add level and score multiplier
-	int32 score = 0;
-	switch (numLines)
+	if (numLines > 0)
 	{
-	case 1: score = 40; break;
-	case 2: score = 100; break;
-	case 3: score = 300; break;
-	case 4: score = 1200; break;
+		m_gameMode->OnClearLines(numLines);
 	}
-
-	Lines += numLines;
-	Score += score;
-
-	m_scoreEvent.Broadcast(Lines, Score);
 }
 
 void ABoard::PlaceBlocks(const FIntPoint& position)
@@ -298,6 +292,15 @@ void ABoard::PlaceBlocks(const FIntPoint& position)
 		localPos += position;
 	}
 	PlaceBlocks(localGridPositions);
+}
+
+
+
+void ABoard::CopyTile(const TileData& source, TileData& dest) const
+{
+	dest.filled = source.filled;
+	dest.block->SetActorHiddenInGame(!source.filled);
+	dest.block->SetTheme(source.block->GetTheme());
 }
 
 void ABoard::SetTileFilled(uint8 row, uint8 col, bool filled)

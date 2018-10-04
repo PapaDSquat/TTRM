@@ -38,6 +38,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	const FBlockTheme& GetTheme() const;
 	void SetTheme(const FBlockTheme& theme);
 	
 private:
