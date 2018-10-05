@@ -136,6 +136,8 @@ void ABoard::RotateCCW()
 
 void ABoard::Drop()
 {
+	// TODO: Simply copy ghost position
+
 	auto offset = FIntPoint(1, 0);
 	while (TryMoveTetromino(offset))
 	{
@@ -187,30 +189,11 @@ bool ABoard::TryMoveTetromino(const FIntPoint& offset)
 	return true;
 }
 
-
-
 void ABoard::RepositionActiveTetromino()
 {
-	{
-		const FVector location(m_activePosition.Y * 100.f, 0.f, -m_activePosition.X * 100.f);
-		m_activeTetromino->SetActorRelativeLocation(location);
-	}
-
-	{
-		// Find ghost position
-		FIntPoint offset = FIntPoint(s_gridRows - m_activePosition.X, 0);
-		
-		do 
-		{
-			--offset.X;
-		}
-		while (!TryMoveTetromino(offset));
-
-		const FIntPoint ghostPosition = m_activePosition + offset;
-		const FVector location(ghostPosition.Y * 100.f, 0.f, -ghostPosition.X * 100.f);
-		m_ghostTetromino->SetActorRelativeLocation(location);
-		UpdateGhost();
-	}
+	const FVector location(m_activePosition.Y * 100.f, 0.f, -m_activePosition.X * 100.f);
+	m_activeTetromino->SetActorRelativeLocation(location);
+	UpdateGhost();
 }
 
 void ABoard::SpawnNewTetromino()
@@ -322,6 +305,18 @@ FBox2D ABoard::GetActiveBounds() const
 
 void ABoard::UpdateGhost()
 {
+	// Find ghost position
+	FIntPoint offset = FIntPoint(s_gridRows - m_activePosition.X, 0);
+
+	do
+	{
+		--offset.X;
+	} while (!TryMoveTetromino(offset));
+
+	const FIntPoint ghostPosition = m_activePosition + offset;
+	const FVector location(ghostPosition.Y * 100.f, 0.f, -ghostPosition.X * 100.f);
+	m_ghostTetromino->SetActorRelativeLocation(location);
+
 	m_activeTetromino->CopyConfig(m_ghostTetromino);
 }
 
