@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../Utils/ObjectBag.h"
 #include "Block.h"
 #include "Tetromino.generated.h"
 
@@ -58,7 +59,7 @@ public:
 
 	static ETetrominoType GetRandomType();
 	static uint8 GetRandomRotation();
-	FBlockTheme GetRandomTheme();
+	const FBlockTheme& GetRandomTheme();
 
 private:
 	struct RotationConfig
@@ -90,6 +91,8 @@ private:
 	ABlock* m_blocks[s_totalBlocks];
 
 	FBlockTheme m_theme;
+
+	ObjectBag< FBlockTheme > m_themeBag;
 	
 	bool m_isShadow{ false };
 

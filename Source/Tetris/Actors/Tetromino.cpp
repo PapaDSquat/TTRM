@@ -23,6 +23,10 @@ void ATetromino::BeginPlay()
 		Themes.Push(FBlockTheme()); // Create default theme
 	}
 
+	// Setup themes
+	static int8 s_themeCopies = 3;
+	m_themeBag.Add(Themes, 3);
+
 	SpawnBlocks();
 	Randomize();
 }
@@ -31,7 +35,6 @@ void ATetromino::BeginPlay()
 void ATetromino::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ATetromino::RotateCW()
@@ -110,7 +113,7 @@ void ATetromino::SetTheme(const FBlockTheme& theme)
 
 ETetrominoType ATetromino::GetRandomType()
 {
-	return (ETetrominoType)FMath::RandRange(0, (int32)ETetrominoType::Count - 1);;
+	return (ETetrominoType)FMath::RandRange(0, (int32)ETetrominoType::Count - 1);
 }
 
 uint8 ATetromino::GetRandomRotation()
@@ -118,9 +121,9 @@ uint8 ATetromino::GetRandomRotation()
 	return FMath::RandRange(0, s_rotations - 1);
 }
 
-FBlockTheme ATetromino::GetRandomTheme()
+const FBlockTheme& ATetromino::GetRandomTheme()
 {
-	return Themes[ FMath::RandRange(0, Themes.Num() - 1) ];
+	return m_themeBag.Pull();
 }
 
 void ATetromino::SpawnBlocks()
