@@ -11,7 +11,7 @@
 class ABlock;
 
 UENUM()
-enum class ETetrominoType
+enum class ETetrominoType : int8
 {
 	I,
 	O,

@@ -24,6 +24,11 @@ void ABoard::BeginPlay()
 	
 	m_gameMode = (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
 
+	for (int8 i = 0; i < (int8)ETetrominoType::Count; ++i)
+	{
+		m_typeBag.Add((ETetrominoType)i, 2);
+	}
+
 	// Init board
 	for (uint8 r = 0; r < s_gridRows; ++r)
 	{
@@ -199,6 +204,7 @@ void ABoard::RepositionActiveTetromino()
 void ABoard::SpawnNewTetromino()
 {
 	m_activeTetromino->Randomize();
+	m_activeTetromino->SetType(m_typeBag.Pull());
 	m_activePosition.X = 0;
 	m_activePosition.Y = ( s_gridCols / 2 ) - 1;
 

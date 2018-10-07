@@ -29,7 +29,7 @@ private:
 	TArray< Type > m_objectsPool;		// Pool to pull new objects from to place into bag
 	TArray< Type > m_objectsPulled;		// All objects currently pulled into bag
 
-	const Type m_defaultObj;
+	Type m_defaultObj;
 };
 
 template< typename Type >
@@ -69,7 +69,9 @@ const Type& ObjectBag<Type>::Pull()
 	// Re-fill bag
 	if (m_objectsPool.Num() == 0)
 	{
-		while (m_objectsPulled.Num() > 0)
+		int32 count = m_objectsPulled.Num();
+		m_objectsPool.Reserve(count);
+		while (count-- > 0)
 		{
 			m_objectsPool.Push(m_objectsPulled.Pop());
 		}

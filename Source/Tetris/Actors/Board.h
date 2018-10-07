@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../Utils/ObjectBag.h"
 #include "Board.generated.h"
 
 class ABlock;
 class ATetromino;
 class ATetrisGameMode;
+enum class ETetrominoType : int8;
 
 UCLASS()
 class TETRIS_API ABoard : public AActor
@@ -65,13 +67,18 @@ private:
 	static const uint8 s_gridCols = 10;
 	TileData m_grid[s_gridRows][s_gridCols];
 
+	ObjectBag< ETetrominoType > m_typeBag;
+
 	ATetromino* m_activeTetromino;
+	ATetromino* m_nextTetromino;
+	ATetromino* m_holdTetromino;
 	ATetromino* m_ghostTetromino;
 	FIntPoint m_activePosition;
 
 	FTimerHandle m_dropTimerHandle;
 
 	ATetrisGameMode* m_gameMode;
+
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Tetris Setup")
