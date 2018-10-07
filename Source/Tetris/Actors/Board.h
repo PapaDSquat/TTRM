@@ -36,6 +36,7 @@ public:
 	void RotateCW();
 	void RotateCCW();
 	void Drop();
+	void Hold();
 
 private:
 	struct TileData
@@ -79,6 +80,7 @@ private:
 
 	ATetrisGameMode* m_gameMode;
 
+	bool m_canHold;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Tetris Setup")

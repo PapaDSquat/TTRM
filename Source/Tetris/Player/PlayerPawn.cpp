@@ -39,6 +39,7 @@ void APlayerPawn::BeginPlay()
 		InputComponent->BindAction("RotateCW", IE_Pressed, m_board, &ABoard::RotateCW);
 		InputComponent->BindAction("RotateCCW", IE_Pressed, m_board, &ABoard::RotateCCW);
 		InputComponent->BindAction("Drop", IE_Pressed, m_board, &ABoard::Drop);
+		InputComponent->BindAction("Hold", IE_Pressed, m_board, &ABoard::Hold);
 	}
 
 }

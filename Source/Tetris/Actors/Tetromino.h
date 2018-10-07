@@ -45,12 +45,14 @@ public:
 	void RotateCCW();
 
 	void Randomize();
-	void CopyConfig(ATetromino* other) const;
+	void CopyConfigTo(ATetromino* other) const;
+	void SwapConfig(ATetromino* other);
 
 	const TArray< FIntPoint >& GetGridPositions() const;
 	FBox2D GetBounds() const;
 	FIntPoint GetRealSize() const;
 
+	ETetrominoType GetType() const;
 	void SetType(ETetrominoType type);
 	void SetIsShadow(bool isShadow);
 

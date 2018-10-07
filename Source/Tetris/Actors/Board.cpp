@@ -12,6 +12,7 @@ const uint8 ABoard::s_gridCols;
 
 // Sets default values
 ABoard::ABoard()
+: m_canHold( true )
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -61,12 +62,36 @@ void ABoard::BeginPlay()
 		FActorSpawnParameters spawnInfo;
 		spawnInfo.Owner = this;
 
-		m_activeTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
-		m_activeTetromino->AttachToActor(this, attachRules);
+		{
+			m_activeTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+			m_activeTetromino->AttachToActor(this, attachRules);
+		}
 
-		m_ghostTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
-		m_ghostTetromino->AttachToActor(this, attachRules);
-		m_ghostTetromino->SetIsShadow(true);
+		{
+			m_nextTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+			m_nextTetromino->AttachToActor(this, attachRules);
+
+			const FVector localLocation(-1475.f, 0.f, -200.f);
+			m_nextTetromino->SetActorRelativeLocation(localLocation);
+			m_nextTetromino->Randomize();
+			m_nextTetromino->SetType(m_typeBag.Pull());
+		}
+
+		{
+			m_holdTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+			m_holdTetromino->AttachToActor(this, attachRules);
+
+			const FVector localLocation(-1475.f, 0.f, -900.f);
+			m_holdTetromino->SetActorRelativeLocation(localLocation);
+
+			m_holdTetromino->SetType(ETetrominoType::Count);
+		}
+
+		{
+			m_ghostTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+			m_ghostTetromino->AttachToActor(this, attachRules);
+			m_ghostTetromino->SetIsShadow(true);
+		}
 	}
 
 
@@ -154,6 +179,27 @@ void ABoard::Drop()
 	SpawnNewTetromino();
 }
 
+void ABoard::Hold()
+{
+	if (!m_canHold)
+		return;
+
+	if( m_holdTetromino->GetType() == ETetrominoType::Count )
+	{
+		m_activeTetromino->CopyConfigTo(m_holdTetromino);
+		SpawnNewTetromino();
+	}
+	else
+	{
+		m_activeTetromino->SwapConfig(m_holdTetromino);
+	}
+
+	// Need to place a piece in order to re-active hold
+	m_canHold = false;
+
+	UpdateGhost();
+}
+
 void ABoard::OnDescendTimer()
 {
 	MoveDown();
@@ -203,12 +249,20 @@ void ABoard::RepositionActiveTetromino()
 
 void ABoard::SpawnNewTetromino()
 {
-	m_activeTetromino->Randomize();
-	m_activeTetromino->SetType(m_typeBag.Pull());
-	m_activePosition.X = 0;
-	m_activePosition.Y = ( s_gridCols / 2 ) - 1;
+	{
+		m_nextTetromino->CopyConfigTo(m_activeTetromino);
+		m_activePosition.X = 0;
+		m_activePosition.Y = (s_gridCols / 2) - 1;
 
-	RepositionActiveTetromino();
+		RepositionActiveTetromino();
+	}
+
+	{
+		m_nextTetromino->Randomize();
+		m_nextTetromino->SetType(m_typeBag.Pull());
+	}
+
+	m_canHold = true;
 }
 
 void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
@@ -323,6 +377,6 @@ void ABoard::UpdateGhost()
 	const FVector location(ghostPosition.Y * 100.f, 0.f, -ghostPosition.X * 100.f);
 	m_ghostTetromino->SetActorRelativeLocation(location);
 
-	m_activeTetromino->CopyConfig(m_ghostTetromino);
+	m_activeTetromino->CopyConfigTo(m_ghostTetromino);
 }
 

@@ -148,7 +148,7 @@ void ATetromino::RepositionBlocks()
 
 void ATetromino::PositionBlocks(const RotationConfig& config)
 {
-	for (uint8 i = 0; i < s_totalBlocks; ++i)
+	for (uint8 i = 0; i < config.m_positions.Num(); ++i)
 	{
 		const FIntPoint& gridPosition = config.m_positions[i];
 		if (ABlock* block = m_blocks[i])
@@ -171,11 +171,31 @@ void ATetromino::SetRotation(uint8 index)
 	}
 }
 
-void ATetromino::CopyConfig(ATetromino* other) const
+void ATetromino::CopyConfigTo(ATetromino* other) const
 {
 	other->SetTheme(m_theme);
 	other->SetType(m_type);
 	other->SetRotation(m_rotationIndex);
+}
+
+void ATetromino::SwapConfig(ATetromino* other)
+{
+	const FBlockTheme theme = m_theme;
+	const ETetrominoType type = m_type;
+	const uint8 rotation = m_rotationIndex;
+
+	SetTheme(other->m_theme);
+	SetType(other->m_type);
+	SetRotation(other->m_rotationIndex);
+
+	other->SetTheme(theme);
+	other->SetType(type);
+	other->SetRotation(rotation);
+}
+
+ETetrominoType ATetromino::GetType() const
+{
+	return m_type;
 }
 
 void ATetromino::SetType(ETetrominoType type)
@@ -226,6 +246,18 @@ void ATetromino::SetType(ETetrominoType type)
 		m_rotations[2] = RotationConfig({ FIntPoint(1,0), FIntPoint(1,1), FIntPoint(2,1), FIntPoint(2,2) });
 		m_rotations[3] = RotationConfig({ FIntPoint(0,2), FIntPoint(1,1), FIntPoint(1,2), FIntPoint(2,1) });
 	break;
+	case ETetrominoType::Count:
+		m_rotations[0] = RotationConfig();
+		m_rotations[1] = RotationConfig();
+		m_rotations[2] = RotationConfig();
+		m_rotations[3] = RotationConfig();
+		break;
+	}
+
+	const bool hideBlocks = (type == ETetrominoType::Count);
+	for (uint8 i = 0; i < s_totalBlocks; ++i)
+	{
+		m_blocks[i]->SetActorHiddenInGame(hideBlocks);
 	}
 
 	RepositionBlocks();
