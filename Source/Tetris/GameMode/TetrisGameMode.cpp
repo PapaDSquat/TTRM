@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TetrisGameMode.h"
-
+#include "../Theme/TetrisTheme.h"
+#include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -27,6 +28,14 @@ void ATetrisGameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	m_currentTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+}
+
+const FTetrisTheme* ATetrisGameMode::GetCurrentTheme() const
+{
+	// TODO
+	// static const FString Context = FString(TEXT("ATetrisGameMode::GetCurrentTheme"));
+	// return ThemesData->FindRow<FTetrisTheme>(ThemeName, Context);
+	return nullptr;
 }
 
 float ATetrisGameMode::GetGameSpeed() const

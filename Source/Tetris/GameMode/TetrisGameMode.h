@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "GameFramework/GameModeBase.h"
 #include "TetrisGameMode.generated.h"
 
-/**
- * 
- */
+struct FTetrisTheme;
+
 UCLASS()
 class TETRIS_API ATetrisGameMode : public AGameModeBase
 {
@@ -33,6 +33,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Tetris")
 	int32 InitialTetrominoDropTime;
 
+	// TODO: Find a way to expose this to BP
+	const FTetrisTheme* GetCurrentTheme() const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
+	TSoftObjectPtr<UDataTable> ThemesData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
+	FName ThemeName;
+
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	virtual float GetGameSpeed() const;
 	virtual float GetTetrominoDropTime() const;
@@ -40,16 +49,16 @@ public:
 	// TODO: Multiple Players. Group stats into each.
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
 	int32 Lines;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
-	int32 Score;
-
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	int32 GetLines() const { return Lines; }
 
+	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
+	int32 Score;
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	int32 GetScore() const { return Score; }
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	FString GetRoundTimeString() const;
 };
+
+	

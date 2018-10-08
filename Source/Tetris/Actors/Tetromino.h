@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../Theme/TetrisTheme.h"
 #include "../Utils/ObjectBag.h"
 #include "Block.h"
 #include "Tetromino.generated.h"

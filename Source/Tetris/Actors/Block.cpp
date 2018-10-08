@@ -2,12 +2,6 @@
 
 #include "Block.h"
 
-FBlockTheme::FBlockTheme()
-	: Tint(FColor::White)
-	, Opacity(1.f)
-{}
-
-
 // Sets default values
 ABlock::ABlock()
 {

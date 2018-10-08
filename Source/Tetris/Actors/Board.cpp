@@ -2,6 +2,9 @@
 
 #include "Board.h"
 
+#include "Kismet/GameplayStatics.h"
+
+#include "../Theme/TetrisTheme.h"
 #include "../Actors/Block.h"
 #include "../Actors/Tetromino.h"
 #include "../GameMode/TetrisGameMode.h"
@@ -176,6 +179,9 @@ void ABoard::Drop()
 	offset.X -= 1;
 	PlaceBlocks(m_activePosition + offset);
 	SpawnNewTetromino();
+
+	// TODO
+	// UGameplayStatics::PlaySound2D(GetWorld(), m_gameMode->GetCurrentTheme()->DropPieceSound.Get());
 }
 
 void ABoard::Hold()

@@ -4,22 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../Theme/TetrisTheme.h"
 #include "Block.generated.h"
-
-// TODO: Block Theme should be readable from somewhere external/
-USTRUCT()
-struct FBlockTheme
-{
-	GENERATED_USTRUCT_BODY()
-
-	FBlockTheme();
-
-	UPROPERTY(EditAnywhere, Category = "Block Theme")
-	FColor Tint;
-
-	UPROPERTY(EditAnywhere, Category = "Block Theme")
-	float Opacity;
-};
 
 UCLASS()
 class TETRIS_API ABlock : public AActor
