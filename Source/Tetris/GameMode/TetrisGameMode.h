@@ -27,6 +27,16 @@ protected:
 	float m_currentTime;
 
 public:
+	UPROPERTY(EditAnywhere, Category = "Tetris")
+	int32 InitialGameSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Tetris")
+	int32 InitialTetrominoDropTime;
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	virtual float GetGameSpeed() const;
+	virtual float GetTetrominoDropTime() const;
+
 	// TODO: Multiple Players. Group stats into each.
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
 	int32 Lines;

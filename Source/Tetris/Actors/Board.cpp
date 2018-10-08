@@ -98,8 +98,7 @@ void ABoard::BeginPlay()
 	m_activePosition.X = 0;
 	m_activePosition.Y = s_gridCols / 2;
 	RepositionActiveTetromino();
-
-	GetWorldTimerManager().SetTimer(m_dropTimerHandle, this, &ABoard::OnDescendTimer, 1.25f, true, 1.0f);
+	ResetDropTimer();
 }
 
 // Called every frame
@@ -324,6 +323,7 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 	if (numLines > 0)
 	{
 		m_gameMode->OnClearLines(numLines);
+		ResetDropTimer();
 	}
 }
 
@@ -378,5 +378,11 @@ void ABoard::UpdateGhost()
 	m_ghostTetromino->SetActorRelativeLocation(location);
 
 	m_activeTetromino->CopyConfigTo(m_ghostTetromino);
+}
+
+void ABoard::ResetDropTimer()
+{
+	GetWorldTimerManager().ClearTimer(m_dropTimerHandle);
+	GetWorldTimerManager().SetTimer(m_dropTimerHandle, this, &ABoard::OnDescendTimer, m_gameMode->GetTetrominoDropTime(), true, 0.0f);
 }
 

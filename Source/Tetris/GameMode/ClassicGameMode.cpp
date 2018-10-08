@@ -64,4 +64,13 @@ void AClassicGameMode::BeginPlay()
 	Super::BeginPlay();
 }
 
+float AClassicGameMode::GetGameSpeed() const
+{
+	return Level + 1;
+}
+
+float AClassicGameMode::GetTetrominoDropTime() const
+{
+	return InitialTetrominoDropTime / (GetGameSpeed());
+}
 

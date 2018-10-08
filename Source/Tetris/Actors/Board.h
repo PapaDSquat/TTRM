@@ -64,6 +64,8 @@ private:
 
 	void UpdateGhost();
 
+	void ResetDropTimer();
+
 	static const uint8 s_gridRows = 24;
 	static const uint8 s_gridCols = 10;
 	TileData m_grid[s_gridRows][s_gridCols];

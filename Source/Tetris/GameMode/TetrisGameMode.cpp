@@ -8,6 +8,8 @@
 ATetrisGameMode::ATetrisGameMode()
 	: Lines(0)
 	, Score(0)
+	, InitialGameSpeed(1.f)
+	, InitialTetrominoDropTime(1.f)
 {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	PrimaryActorTick.bCanEverTick = true;
@@ -25,6 +27,16 @@ void ATetrisGameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	m_currentTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+}
+
+float ATetrisGameMode::GetGameSpeed() const
+{
+	return InitialGameSpeed;
+}
+
+float ATetrisGameMode::GetTetrominoDropTime() const
+{
+	return InitialTetrominoDropTime;
 }
 
 FString ATetrisGameMode::GetRoundTimeString() const

@@ -32,6 +32,10 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	virtual float GetGameSpeed() const override;
+	virtual float GetTetrominoDropTime() const;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
 	int32 Level;
 
