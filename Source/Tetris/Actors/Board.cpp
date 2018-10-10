@@ -2,8 +2,6 @@
 
 #include "Board.h"
 
-#include "Kismet/GameplayStatics.h"
-
 #include "../Theme/TetrisTheme.h"
 #include "../Actors/Block.h"
 #include "../Actors/Tetromino.h"
@@ -178,10 +176,8 @@ void ABoard::Drop()
 
 	offset.X -= 1;
 	PlaceBlocks(m_activePosition + offset);
+	OnPlaceTetromino().Broadcast();
 	SpawnNewTetromino();
-
-	// TODO
-	// UGameplayStatics::PlaySound2D(GetWorld(), m_gameMode->GetCurrentTheme()->DropPieceSound.Get());
 }
 
 void ABoard::Hold()
@@ -328,6 +324,12 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 
 	if (numLines > 0)
 	{
+		if (numLines == 4)
+			OnClearTetris().Broadcast();
+		else
+			OnClearLines123().Broadcast(numLines);
+
+		// TODO: Game Mode should listen to event
 		m_gameMode->OnClearLines(numLines);
 		ResetDropTimer();
 	}

@@ -2,7 +2,10 @@
 
 #include "PlayerPawn.h"
 
+#include "Kismet/GameplayStatics.h"
+
 #include "../Actors/Board.h"
+#include "../GameMode/TetrisGameMode.h"
 
 
 // Sets default values
@@ -19,7 +22,10 @@ APlayerPawn::APlayerPawn()
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	m_gameMode = (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
 	
+	if(BoardClass != nullptr)
 	{
 		FVector location(0.0f, 0.0f, 0.0f);
 		FRotator rotation(0.0f, 0.0f, 0.0f);
@@ -29,6 +35,12 @@ void APlayerPawn::BeginPlay()
 
 		FAttachmentTransformRules attachRules(EAttachmentRule::KeepRelative, false);
 		m_board->AttachToActor(this, attachRules);
+
+		// Bind to events
+		m_board->OnPlaceTetromino().AddUObject(this, &APlayerPawn::OnBoardPlaceTetromino);
+		m_board->OnClearLines123().AddUObject(this, &APlayerPawn::OnBoardClearLines123);
+		m_board->OnClearTetris().AddUObject(this, &APlayerPawn::OnBoardClearTetris);
+		m_board->OnGameOver().AddUObject(this, &APlayerPawn::OnBoardGameOver);
 	}
 
 	if (InputComponent)
@@ -59,4 +71,36 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void APlayerPawn::OnBoardPlaceTetromino()
+{
+	if (const auto sound = m_gameMode->GetCurrentTheme().DropPieceSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), sound);
+	}
+}
+
+void APlayerPawn::OnBoardClearLines123( int8 numLines )
+{
+	if (const auto sound = m_gameMode->GetCurrentTheme().ClearLinesSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), sound);
+	}
+}
+
+void APlayerPawn::OnBoardClearTetris()
+{
+	if (const auto sound = m_gameMode->GetCurrentTheme().TetrisSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), sound);
+	}
+}
+
+void APlayerPawn::OnBoardGameOver()
+{
+	if (const auto sound = m_gameMode->GetCurrentTheme().GameOverSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), sound);
+	}
 }

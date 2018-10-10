@@ -38,6 +38,19 @@ public:
 	void Drop();
 	void Hold();
 
+	// Events
+	DECLARE_EVENT(ABoard, FPlaceTetrominoEvent)
+	FPlaceTetrominoEvent& OnPlaceTetromino() { return m_evtPlaceTetromino; }
+
+	DECLARE_EVENT_OneParam(ABoard, FClearLines123Event, int8 /*numLines*/)
+	FClearLines123Event& OnClearLines123() { return m_evtClearLines123; }
+
+	DECLARE_EVENT(ABoard, FClearTetrisEvent)
+	FClearTetrisEvent& OnClearTetris() { return m_evtClearTetris; }
+
+	DECLARE_EVENT(ABoard, FGameOverEvent)
+	FGameOverEvent& OnGameOver() { return m_evtGameOver; }
+
 private:
 	struct TileData
 	{
@@ -83,6 +96,12 @@ private:
 	ATetrisGameMode* m_gameMode;
 
 	bool m_canHold;
+
+	// Events
+	FPlaceTetrominoEvent m_evtPlaceTetromino;
+	FClearLines123Event m_evtClearLines123;
+	FClearTetrisEvent m_evtClearTetris;
+	FGameOverEvent m_evtGameOver;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Tetris Setup")

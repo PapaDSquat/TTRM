@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+class ATetrisGameMode;
 class ABoard;
 
 UCLASS()
@@ -29,6 +30,13 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	// Board Event Callbacks
+	void OnBoardPlaceTetromino();
+	void OnBoardClearLines123(int8 numLines);
+	void OnBoardClearTetris();
+	void OnBoardGameOver();
+
+	ATetrisGameMode* m_gameMode;
 	ABoard* m_board;
 
 public:

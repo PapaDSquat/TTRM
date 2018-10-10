@@ -20,6 +20,9 @@ void ATetrisGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Force Themes to load
+	//Themes.LoadSynchronous();
+
 	m_startTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 }
 
@@ -30,12 +33,13 @@ void ATetrisGameMode::Tick(float DeltaTime)
 	m_currentTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 }
 
-const FTetrisTheme* ATetrisGameMode::GetCurrentTheme() const
+const FTetrisTheme& ATetrisGameMode::GetCurrentTheme() const
 {
-	// TODO
-	// static const FString Context = FString(TEXT("ATetrisGameMode::GetCurrentTheme"));
-	// return ThemesData->FindRow<FTetrisTheme>(ThemeName, Context);
-	return nullptr;
+	if (Themes)
+	{
+		return Themes->GetTheme(ThemeID);
+	}
+	return FTetrisTheme::DEFAULT();
 }
 
 float ATetrisGameMode::GetGameSpeed() const

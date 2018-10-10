@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/DataTable.h"
+#include "Engine/DataAsset.h"
 #include "Sound/SoundCue.h"
 #include "TetrisTheme.generated.h"
 
@@ -30,43 +31,67 @@ struct FBlockTheme
 };
 
 USTRUCT(BlueprintType)
-struct TETRIS_API FTetrisTheme : public FTableRowBase
+struct TETRIS_API FTetrisTheme
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
+	static const FTetrisTheme& DEFAULT();
 
 	FTetrisTheme()
+		: GhostPieceAlpha( 0.5f )
 	{}
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
+	FName ThemeID;
+
 	/*
-		Graphics
+	Graphics
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
-	TSoftObjectPtr<UTexture> BlockTexture;
+	UTexture* BlockTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
 	TArray<FBlockTheme> BlockColors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
-	TSoftObjectPtr<UTexture> BackgroundTexture;
+	UTexture* BackgroundTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
+	float GhostPieceAlpha;
 
 	/*
-		Audio
+	Audio
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
-	TSoftObjectPtr<USoundCue> Music;
+	USoundCue* Music;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
-	TSoftObjectPtr<USoundCue> DropPieceSound;
+	USoundCue* DropPieceSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
-	TSoftObjectPtr<USoundCue> ClearLinesSound;
+	USoundCue* ClearLinesSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
-	TSoftObjectPtr<USoundCue> TetrisSound;
+	USoundCue* TetrisSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
-	TSoftObjectPtr<USoundCue> DeathSound;
+	USoundCue* LevelUpSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundCue* GameOverSound;
 };
 
+/**
+* Create UDataAsset of this type in Editor to fill with themes
+*/
+UCLASS()
+class TETRIS_API UTetrisThemeCollection : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	const FTetrisTheme& GetTheme(const FName& themeName);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FTetrisTheme> Themes;
+};

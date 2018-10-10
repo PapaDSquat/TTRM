@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/GameModeBase.h"
+#include "../Tetris/Theme/TetrisTheme.h"
 #include "TetrisGameMode.generated.h"
 
 struct FTetrisTheme;
@@ -34,13 +35,14 @@ public:
 	int32 InitialTetrominoDropTime;
 
 	// TODO: Find a way to expose this to BP
-	const FTetrisTheme* GetCurrentTheme() const;
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	const FTetrisTheme& GetCurrentTheme() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
-	TSoftObjectPtr<UDataTable> ThemesData;
+	UTetrisThemeCollection* Themes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
-	FName ThemeName;
+	FName ThemeID;
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	virtual float GetGameSpeed() const;
