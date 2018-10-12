@@ -34,7 +34,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Tetris")
 	int32 InitialTetrominoDropTime;
 
-	// TODO: Find a way to expose this to BP
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	const FTetrisTheme& GetCurrentTheme() const;
 

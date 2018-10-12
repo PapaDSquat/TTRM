@@ -10,6 +10,26 @@ const FTetrisTheme& FTetrisTheme::DEFAULT()
 
 //==============================================================================
 
+void UTetrisThemeCollection::PostLoad()
+{
+	Super::PostLoad();
+
+	// Maybe a bad idea...shouldn't happen when we load the asset in Editor
+	for (FTetrisTheme& theme : Themes)
+	{
+		if (theme.BlockTexture == nullptr)
+			continue; 
+
+		for (FBlockTheme& blockTheme : theme.BlockColors)
+		{
+			if (blockTheme.Texture == nullptr)
+			{
+				blockTheme.Texture = theme.BlockTexture;
+			}
+		}
+	}
+}
+
 const FTetrisTheme& UTetrisThemeCollection::GetTheme(const FName& themeName)
 {
 	FTetrisTheme* foundTheme = Themes.FindByPredicate([themeName](const FTetrisTheme& theme)

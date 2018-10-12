@@ -21,7 +21,7 @@ struct FBlockTheme
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<UTexture> Texture;
+	UTexture* Texture;
 
 	UPROPERTY(EditAnywhere)
 	FColor Tint;
@@ -90,6 +90,8 @@ class TETRIS_API UTetrisThemeCollection : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	virtual void PostLoad() override;
+
 	const FTetrisTheme& GetTheme(const FName& themeName);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

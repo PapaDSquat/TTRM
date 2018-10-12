@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Tetromino.h"
+#include "../GameMode/TetrisGameMode.h"
 
 const uint8 ATetromino::s_totalBlocks;
 const uint8 ATetromino::s_maxGridSize;
@@ -23,9 +24,13 @@ void ATetromino::BeginPlay()
 		Themes.Push(FBlockTheme()); // Create default theme
 	}
 
+	ATetrisGameMode* gameMode = (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
+	
+
 	// Setup themes
+	// TODO: Move this out of here, to Board?
 	static int8 s_themeCopies = 3;
-	m_themeBag.Add(Themes, 3);
+	m_themeBag.Add(gameMode->GetCurrentTheme().BlockColors, 2);
 
 	SpawnBlocks();
 	Randomize();
