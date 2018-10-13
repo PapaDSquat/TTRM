@@ -27,6 +27,8 @@ protected:
 	float m_startTime;
 	float m_currentTime;
 
+	FTetrisTheme m_currentTheme;
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Tetris")
 	int32 InitialGameSpeed;
@@ -36,6 +38,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	const FTetrisTheme& GetCurrentTheme() const;
+
+	// Returns true if theme was changed successfully
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	bool SetTheme(const FName& themeName);
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	const TArray<FTetrisTheme>& GetAllThemes() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
 	UTetrisThemeCollection* Themes;
@@ -60,6 +69,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	FString GetRoundTimeString() const;
+
+	// Events
+public:
+	DECLARE_EVENT_OneParam(ABoard, FSetThemeEvent, const FTetrisTheme&)
+	FSetThemeEvent& OnSetTheme() { return m_evtSetTheme; }
+
+private:
+	FSetThemeEvent m_evtSetTheme;
 };
 
 	

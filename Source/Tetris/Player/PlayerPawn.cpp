@@ -6,6 +6,7 @@
 
 #include "../Actors/Board.h"
 #include "../GameMode/TetrisGameMode.h"
+#include "../Theme/TetrisTheme.h"
 
 
 // Sets default values
@@ -24,24 +25,9 @@ void APlayerPawn::BeginPlay()
 	Super::BeginPlay();
 
 	m_gameMode = (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
+	m_gameMode->OnSetTheme().AddUObject(this, &APlayerPawn::OnSetTheme);
 	
-	if(BoardClass != nullptr)
-	{
-		FVector location(0.0f, 0.0f, 0.0f);
-		FRotator rotation(0.0f, 0.0f, 0.0f);
-		FActorSpawnParameters spawnInfo;
-		spawnInfo.Owner = this;
-		m_board = GetWorld()->SpawnActor< ABoard >(BoardClass, location, rotation, spawnInfo);
-
-		FAttachmentTransformRules attachRules(EAttachmentRule::KeepRelative, false);
-		m_board->AttachToActor(this, attachRules);
-
-		// Bind to events
-		m_board->OnPlaceTetromino().AddUObject(this, &APlayerPawn::OnBoardPlaceTetromino);
-		m_board->OnClearLines123().AddUObject(this, &APlayerPawn::OnBoardClearLines123);
-		m_board->OnClearTetris().AddUObject(this, &APlayerPawn::OnBoardClearTetris);
-		m_board->OnGameOver().AddUObject(this, &APlayerPawn::OnBoardGameOver);
-	}
+	CreateBoard();
 
 	if (InputComponent)
 	{
@@ -71,6 +57,47 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void APlayerPawn::CreateBoard()
+{
+	if (BoardClass != nullptr)
+	{
+		FVector location(0.0f, 0.0f, 0.0f);
+		FRotator rotation(0.0f, 0.0f, 0.0f);
+		FActorSpawnParameters spawnInfo;
+		spawnInfo.Owner = this;
+		m_board = GetWorld()->SpawnActor< ABoard >(BoardClass, location, rotation, spawnInfo);
+
+		FAttachmentTransformRules attachRules(EAttachmentRule::KeepRelative, false);
+		m_board->AttachToActor(this, attachRules);
+
+		// Bind to events
+		m_board->OnPlaceTetromino().AddUObject(this, &APlayerPawn::OnBoardPlaceTetromino);
+		m_board->OnClearLines123().AddUObject(this, &APlayerPawn::OnBoardClearLines123);
+		m_board->OnClearTetris().AddUObject(this, &APlayerPawn::OnBoardClearTetris);
+		m_board->OnGameOver().AddUObject(this, &APlayerPawn::OnBoardGameOver);
+	}
+}
+
+void APlayerPawn::DestroyBoard()
+{
+	if (m_board)
+	{
+		// TODO: Don't do this...doesn't destroy its children
+		m_board->Destroy();
+	}
+}
+
+void APlayerPawn::ResetBoard()
+{
+	DestroyBoard();
+	CreateBoard();
+}
+
+void APlayerPawn::OnSetTheme(const FTetrisTheme& theme)
+{
+	ResetBoard();
 }
 
 void APlayerPawn::OnBoardPlaceTetromino()

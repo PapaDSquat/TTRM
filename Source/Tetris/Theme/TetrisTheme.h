@@ -92,7 +92,9 @@ class TETRIS_API UTetrisThemeCollection : public UDataAsset
 public:
 	virtual void PostLoad() override;
 
-	const FTetrisTheme& GetTheme(const FName& themeName);
+	static const TArray<FTetrisTheme>& DEFAULT();
+	const FTetrisTheme& GetTheme(const FName& themeName) const;
+	const TArray<FTetrisTheme>& GetAllThemes() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FTetrisTheme> Themes;

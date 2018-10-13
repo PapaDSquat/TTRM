@@ -2,13 +2,19 @@
 
 #include "TetrisTheme.h"
 
-static const FTetrisTheme s_default;
 const FTetrisTheme& FTetrisTheme::DEFAULT()
 {
+	static const FTetrisTheme s_default;
 	return s_default;
 }
 
 //==============================================================================
+
+const TArray<FTetrisTheme>& UTetrisThemeCollection::DEFAULT()
+{
+	static const TArray<FTetrisTheme> s_default;
+	return s_default;
+}
 
 void UTetrisThemeCollection::PostLoad()
 {
@@ -30,9 +36,9 @@ void UTetrisThemeCollection::PostLoad()
 	}
 }
 
-const FTetrisTheme& UTetrisThemeCollection::GetTheme(const FName& themeName)
+const FTetrisTheme& UTetrisThemeCollection::GetTheme(const FName& themeName) const
 {
-	FTetrisTheme* foundTheme = Themes.FindByPredicate([themeName](const FTetrisTheme& theme)
+	const FTetrisTheme* foundTheme = Themes.FindByPredicate([themeName](const FTetrisTheme& theme)
 	{
 		return theme.ThemeID == themeName;
 	});
@@ -42,5 +48,10 @@ const FTetrisTheme& UTetrisThemeCollection::GetTheme(const FName& themeName)
 		return *foundTheme;
 	}
 	return FTetrisTheme::DEFAULT();
+}
+
+const TArray<FTetrisTheme>& UTetrisThemeCollection::GetAllThemes() const
+{
+	return Themes;
 }
 
