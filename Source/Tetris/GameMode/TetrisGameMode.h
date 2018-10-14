@@ -10,6 +10,23 @@
 
 struct FTetrisTheme;
 
+UENUM()
+enum class EGameEventType : uint8
+{
+	Start,
+	End,
+	Restart,
+	Pause,
+	Unpause
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSetThemeDelegate, const struct FTetrisTheme&, Theme);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStartEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameRestartEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameEndEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGamePauseEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameUnPauseEvent);
+
 UCLASS()
 class TETRIS_API ATetrisGameMode : public AGameModeBase
 {
@@ -24,12 +41,37 @@ public:
 	virtual void OnClearLines(uint8 numLines) {}
 
 protected:
+	void FireGameEvent( EGameEventType eventType );
+
+	bool m_gameStarted;
+	bool m_gamePaused;
 	float m_startTime;
 	float m_currentTime;
 
 	FTetrisTheme m_currentTheme;
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	void StartGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	void EndGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	void RestartGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	void PauseGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	void UnpauseGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	bool IsGameStarted() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	bool IsGamePaused() const;
+
 	UPROPERTY(EditAnywhere, Category = "Tetris")
 	int32 InitialGameSpeed;
 
@@ -72,11 +114,34 @@ public:
 
 	// Events
 public:
-	DECLARE_EVENT_OneParam(ABoard, FSetThemeEvent, const FTetrisTheme&)
-	FSetThemeEvent& OnSetTheme() { return m_evtSetTheme; }
+	DECLARE_EVENT_OneParam(ATetrisGameMode, FGameEvent, EGameEventType)
+	FGameEvent& OnGameEvent() { return m_evtGameEvent; }
+
+	UPROPERTY(BlueprintAssignable)
+	FGameStartEvent OnGameStart;
+
+	UPROPERTY(BlueprintAssignable)
+	FGameRestartEvent OnGameRestart;
+
+	UPROPERTY(BlueprintAssignable)
+	FGameEndEvent OnGameEnd;
+
+	UPROPERTY(BlueprintAssignable)
+	FGamePauseEvent OnGamePause;
+
+	UPROPERTY(BlueprintAssignable)
+	FGamePauseEvent OnGameUnPause;
+
+	UPROPERTY(BlueprintAssignable)
+	FSetThemeDelegate OnThemeChange;
 
 private:
-	FSetThemeEvent m_evtSetTheme;
+	FGameEvent m_evtGameEvent;
+	FGameStartEvent m_evtGameStart;
+	FGameRestartEvent m_evtGameRestart;
+	FGameEndEvent m_evtGameEnd;
+	FGamePauseEvent m_evtGamePause;
+
 };
 
 	

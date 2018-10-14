@@ -62,7 +62,6 @@ public:
 
 	static ETetrominoType GetRandomType();
 	static uint8 GetRandomRotation();
-	const FBlockTheme& GetRandomTheme();
 
 private:
 	struct RotationConfig

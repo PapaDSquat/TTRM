@@ -11,6 +11,8 @@ ATetrisGameMode::ATetrisGameMode()
 	, Score(0)
 	, InitialGameSpeed(1.f)
 	, InitialTetrominoDropTime(1.f)
+	, m_gameStarted( false )
+	, m_gamePaused( false)
 {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	PrimaryActorTick.bCanEverTick = true;
@@ -34,6 +36,20 @@ void ATetrisGameMode::Tick(float DeltaTime)
 	m_currentTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 }
 
+void ATetrisGameMode::FireGameEvent(EGameEventType eventType)
+{
+	// GameEvent is always fired first
+	OnGameEvent().Broadcast(eventType);
+	switch (eventType)
+	{
+	case EGameEventType::Start: OnGameStart.Broadcast(); break;
+	case EGameEventType::Restart: OnGameRestart.Broadcast(); break;
+	case EGameEventType::End: OnGameEnd.Broadcast(); break;
+	case EGameEventType::Pause: OnGamePause.Broadcast(); break;
+	case EGameEventType::Unpause: OnGameUnPause.Broadcast(); break;
+	}
+}
+
 const FTetrisTheme& ATetrisGameMode::GetCurrentTheme() const
 {
 	return m_currentTheme;
@@ -48,6 +64,59 @@ const TArray<FTetrisTheme>& ATetrisGameMode::GetAllThemes() const
 	return UTetrisThemeCollection::DEFAULT();
 }
 
+void ATetrisGameMode::StartGame()
+{
+	if (!m_gameStarted)
+	{
+		m_gameStarted = true;
+		FireGameEvent(EGameEventType::Start);
+	}
+}
+
+void ATetrisGameMode::EndGame()
+{
+	if (m_gameStarted)
+	{
+		m_gameStarted = false;
+		FireGameEvent(EGameEventType::End);
+	}
+}
+
+void ATetrisGameMode::RestartGame()
+{
+	EndGame();
+	StartGame();
+	FireGameEvent(EGameEventType::Restart);
+}
+
+void ATetrisGameMode::PauseGame()
+{
+	if (!m_gamePaused)
+	{
+		m_gamePaused = true;
+		FireGameEvent(EGameEventType::Pause);
+	}
+}
+
+void ATetrisGameMode::UnpauseGame()
+{
+	if (m_gamePaused)
+	{
+		m_gamePaused = false;
+		FireGameEvent(EGameEventType::Unpause);
+	}
+}
+
+bool ATetrisGameMode::IsGameStarted() const
+{
+	return m_gameStarted;
+}
+
+bool ATetrisGameMode::IsGamePaused() const
+{
+	return m_gamePaused;
+}
+
 bool ATetrisGameMode::SetTheme(const FName& themeName)
 {
 	if (Themes)
@@ -56,7 +125,8 @@ bool ATetrisGameMode::SetTheme(const FName& themeName)
 		if (m_currentTheme.ThemeID != theme.ThemeID)
 		{
 			m_currentTheme = theme;
-			OnSetTheme().Broadcast(m_currentTheme);
+			OnThemeChange.Broadcast(m_currentTheme);
+			RestartGame();
 			return true;
 		}
 	}

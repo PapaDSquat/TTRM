@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../Utils/ObjectBag.h"
+#include "../Actors/Block.h"
 #include "Board.generated.h"
 
 class ABlock;
+struct FBlockTheme;
 class ATetromino;
 class ATetrisGameMode;
 enum class ETetrominoType : int8;
@@ -29,7 +31,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void ResetBoard();
+
 	// Input Interface
+	void SetPaused(bool paused);
 	void MoveLeft();
 	void MoveRight();
 	void MoveDown();
@@ -79,11 +84,15 @@ private:
 
 	void ResetDropTimer();
 
+	ETetrominoType GetRandomTetrominoType();
+	const FBlockTheme& GetRandomBlockTheme();
+
 	static const uint8 s_gridRows = 24;
 	static const uint8 s_gridCols = 10;
 	TileData m_grid[s_gridRows][s_gridCols];
 
 	ObjectBag< ETetrominoType > m_typeBag;
+	ObjectBag< FBlockTheme > m_themeBag;
 
 	ATetromino* m_activeTetromino;
 	ATetromino* m_nextTetromino;

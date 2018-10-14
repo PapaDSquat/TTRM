@@ -9,6 +9,7 @@
 class ATetrisGameMode;
 struct FTetrisTheme;
 class ABoard;
+enum class EGameEventType : uint8;
 
 UCLASS()
 class TETRIS_API APlayerPawn : public APawn
@@ -32,12 +33,22 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	bool IsGameActive() const;
+
 	void CreateBoard();
-	void DestroyBoard();
 	void ResetBoard();
 
+	// Input Interface
+	void MoveLeft();
+	void MoveRight();
+	void MoveDown();
+	void RotateCW();
+	void RotateCCW();
+	void Drop();
+	void Hold();
+
 	// Event Callbacks
-	void OnSetTheme( const FTetrisTheme& theme );
+	void OnGameEvent(EGameEventType eventType);
 	void OnBoardPlaceTetromino();
 	void OnBoardClearLines123(int8 numLines);
 	void OnBoardClearTetris();

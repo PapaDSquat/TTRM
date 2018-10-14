@@ -27,11 +27,6 @@ void ATetromino::BeginPlay()
 	ATetrisGameMode* gameMode = (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
 	
 
-	// Setup themes
-	// TODO: Move this out of here, to Board?
-	static int8 s_themeCopies = 3;
-	m_themeBag.Add(gameMode->GetCurrentTheme().BlockColors, 2);
-
 	SpawnBlocks();
 	Randomize();
 }
@@ -56,7 +51,6 @@ void ATetromino::RotateCCW()
 
 void ATetromino::Randomize()
 {
-	SetTheme(GetRandomTheme());
 	SetType(GetRandomType());
 	SetRotation(GetRandomRotation());
 }
@@ -124,11 +118,6 @@ ETetrominoType ATetromino::GetRandomType()
 uint8 ATetromino::GetRandomRotation()
 {
 	return FMath::RandRange(0, s_rotations - 1);
-}
-
-const FBlockTheme& ATetromino::GetRandomTheme()
-{
-	return m_themeBag.Pull();
 }
 
 void ATetromino::SpawnBlocks()

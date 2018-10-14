@@ -2,7 +2,6 @@
 
 #include "Board.h"
 
-#include "../Theme/TetrisTheme.h"
 #include "../Actors/Block.h"
 #include "../Actors/Tetromino.h"
 #include "../GameMode/TetrisGameMode.h"
@@ -74,8 +73,6 @@ void ABoard::BeginPlay()
 
 			const FVector localLocation(-1475.f, 0.f, -200.f);
 			m_nextTetromino->SetActorRelativeLocation(localLocation);
-			m_nextTetromino->Randomize();
-			m_nextTetromino->SetType(m_typeBag.Pull());
 		}
 
 		{
@@ -84,8 +81,6 @@ void ABoard::BeginPlay()
 
 			const FVector localLocation(-1475.f, 0.f, -900.f);
 			m_holdTetromino->SetActorRelativeLocation(localLocation);
-
-			m_holdTetromino->SetType(ETetrominoType::Count);
 		}
 
 		{
@@ -94,18 +89,58 @@ void ABoard::BeginPlay()
 			m_ghostTetromino->SetIsShadow(true);
 		}
 	}
-
-
-	m_activePosition.X = 0;
-	m_activePosition.Y = s_gridCols / 2;
-	RepositionActiveTetromino();
-	ResetDropTimer();
+	
+	ResetBoard();
 }
 
 // Called every frame
 void ABoard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ABoard::ResetBoard()
+{
+	for (uint8 r = 0; r < s_gridRows; ++r)
+	{
+		for (uint8 c = 0; c < s_gridCols; ++c)
+		{
+			TileData& tile = m_grid[r][c];
+			tile.filled = false;
+			tile.block->SetActorHiddenInGame(true);
+		}
+	}
+	
+	m_typeBag.Refill();
+
+	static int8 s_themeCopies = 3;
+	m_themeBag.Empty();
+	m_themeBag.Add(m_gameMode->GetCurrentTheme().BlockColors, 2);
+
+	m_nextTetromino->Randomize();
+	m_nextTetromino->SetTheme(GetRandomBlockTheme());
+	m_nextTetromino->SetType(GetRandomTetrominoType());
+
+	m_holdTetromino->SetType(ETetrominoType::Count);
+
+	m_activePosition.X = 0;
+	m_activePosition.Y = s_gridCols / 2;
+
+	SpawnNewTetromino();
+	RepositionActiveTetromino();
+	ResetDropTimer();
+}
+
+void ABoard::SetPaused(bool paused)
+{
+	if (paused)
+	{
+		GetWorldTimerManager().PauseTimer(m_dropTimerHandle);
+	}
+	else
+	{
+		GetWorldTimerManager().UnPauseTimer(m_dropTimerHandle);
+	}
 }
 
 void ABoard::MoveLeft()
@@ -260,7 +295,8 @@ void ABoard::SpawnNewTetromino()
 
 	{
 		m_nextTetromino->Randomize();
-		m_nextTetromino->SetType(m_typeBag.Pull());
+		m_nextTetromino->SetTheme(GetRandomBlockTheme());
+		m_nextTetromino->SetType(GetRandomTetrominoType());
 	}
 
 	m_canHold = true;
@@ -374,7 +410,7 @@ FBox2D ABoard::GetActiveBounds() const
 void ABoard::UpdateGhost()
 {
 	// Find ghost position
-	FIntPoint offset = FIntPoint(s_gridRows - m_activePosition.X, 0);
+	FIntPoint offset = FIntPoint((int8)s_gridRows - m_activePosition.X, 0);
 
 	do
 	{
@@ -390,7 +426,20 @@ void ABoard::UpdateGhost()
 
 void ABoard::ResetDropTimer()
 {
-	GetWorldTimerManager().ClearTimer(m_dropTimerHandle);
-	GetWorldTimerManager().SetTimer(m_dropTimerHandle, this, &ABoard::OnDescendTimer, m_gameMode->GetTetrominoDropTime(), true, 0.0f);
+	auto& timeMgr = GetWorldTimerManager();
+	const bool wasPaused = timeMgr.IsTimerPaused(m_dropTimerHandle);
+	timeMgr.ClearTimer(m_dropTimerHandle);
+	timeMgr.SetTimer(m_dropTimerHandle, this, &ABoard::OnDescendTimer, m_gameMode->GetTetrominoDropTime(), true, 0.0f);
+	if (wasPaused)
+		timeMgr.PauseTimer(m_dropTimerHandle);
 }
 
+ETetrominoType ABoard::GetRandomTetrominoType()
+{
+	return m_typeBag.Pull();
+}
+
+const FBlockTheme& ABoard::GetRandomBlockTheme()
+{
+	return m_themeBag.Pull();
+}
