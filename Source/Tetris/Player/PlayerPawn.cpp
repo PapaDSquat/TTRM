@@ -1,13 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerPawn.h"
-
 #include "Kismet/GameplayStatics.h"
-
 #include "../Actors/Board.h"
 #include "../GameMode/TetrisGameMode.h"
 #include "../Theme/TetrisTheme.h"
-
 
 // Sets default values
 APlayerPawn::APlayerPawn()

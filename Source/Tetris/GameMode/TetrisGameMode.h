@@ -8,6 +8,7 @@
 #include "../Tetris/Theme/TetrisTheme.h"
 #include "TetrisGameMode.generated.h"
 
+class UTetrisGameInstance;
 struct FTetrisTheme;
 
 UENUM()
@@ -41,6 +42,7 @@ public:
 	virtual void OnClearLines(uint8 numLines) {}
 
 protected:
+	UTetrisGameInstance* GetTetrisGameInstance();
 	void FireGameEvent( EGameEventType eventType );
 
 	bool m_gameStarted;
@@ -83,7 +85,8 @@ public:
 
 	// Returns true if theme was changed successfully
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
-	bool SetTheme(const FName& themeName);
+	bool SetTheme(const FName& themeID);
+	bool SetTheme(const FTetrisTheme& theme, bool restart = true);
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	const TArray<FTetrisTheme>& GetAllThemes() const;
@@ -92,7 +95,7 @@ public:
 	UTetrisThemeCollection* Themes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
-	FName ThemeID;
+	FName DefaultThemeID;
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	virtual float GetGameSpeed() const;

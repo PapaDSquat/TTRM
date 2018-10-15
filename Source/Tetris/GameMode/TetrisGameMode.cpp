@@ -1,10 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TetrisGameMode.h"
-#include "../Theme/TetrisTheme.h"
 #include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "../Theme/TetrisTheme.h"
+#include "../Audio/TetrisAudioManager.h"
+#include "../TetrisGameInstance.h"
 
 ATetrisGameMode::ATetrisGameMode()
 	: Lines(0)
@@ -24,9 +25,6 @@ void ATetrisGameMode::BeginPlay()
 
 	// Force Themes to load
 	//Themes.LoadSynchronous();
-
-	m_currentTheme = Themes ? Themes->GetTheme(ThemeID) : FTetrisTheme::DEFAULT();
-	m_startTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 }
 
 void ATetrisGameMode::Tick(float DeltaTime)
@@ -34,6 +32,11 @@ void ATetrisGameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	m_currentTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+}
+
+UTetrisGameInstance* ATetrisGameMode::GetTetrisGameInstance()
+{
+	return Cast<UTetrisGameInstance>(GetGameInstance());
 }
 
 void ATetrisGameMode::FireGameEvent(EGameEventType eventType)
@@ -69,6 +72,19 @@ void ATetrisGameMode::StartGame()
 	if (!m_gameStarted)
 	{
 		m_gameStarted = true;
+
+		m_startTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+
+		if (Themes && 
+			m_currentTheme == FTetrisTheme::DEFAULT())
+		{
+			SetTheme(Themes->GetTheme(DefaultThemeID), false);
+		}
+
+		// Why doesn't this work??
+ 		//GetTetrisGameInstance()->GetAudioManager()->PlayMusic(m_currentTheme.Music);
+		UGameplayStatics::PlaySound2D(GetWorld(), m_currentTheme.Music);
+
 		FireGameEvent(EGameEventType::Start);
 	}
 }
@@ -117,18 +133,24 @@ bool ATetrisGameMode::IsGamePaused() const
 	return m_gamePaused;
 }
 
-bool ATetrisGameMode::SetTheme(const FName& themeName)
+bool ATetrisGameMode::SetTheme(const FName& themeID)
 {
 	if (Themes)
 	{
-		const FTetrisTheme& theme = Themes->GetTheme(themeName);
-		if (m_currentTheme.ThemeID != theme.ThemeID)
-		{
-			m_currentTheme = theme;
-			OnThemeChange.Broadcast(m_currentTheme);
+		return SetTheme(Themes->GetTheme(themeID));
+	}
+	return false;
+}
+
+bool ATetrisGameMode::SetTheme(const FTetrisTheme& theme, bool restart /*= true*/)
+{
+	if (m_currentTheme.ThemeID != theme.ThemeID)
+	{
+		m_currentTheme = theme;
+		OnThemeChange.Broadcast(m_currentTheme);
+		if(restart)
 			RestartGame();
-			return true;
-		}
+		return true;
 	}
 	return false;
 }

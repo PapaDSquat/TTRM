@@ -41,6 +41,8 @@ struct TETRIS_API FTetrisTheme
 		: GhostPieceAlpha( 0.5f )
 	{}
 
+	bool operator == (const FTetrisTheme& rhs) const;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
 	FName ThemeID;
 
@@ -55,6 +57,9 @@ struct TETRIS_API FTetrisTheme
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
 	UTexture* BackgroundTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
+	UTexture* BorderTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
 	float GhostPieceAlpha;

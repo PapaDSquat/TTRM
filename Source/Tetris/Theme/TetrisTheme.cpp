@@ -8,6 +8,11 @@ const FTetrisTheme& FTetrisTheme::DEFAULT()
 	return s_default;
 }
 
+bool FTetrisTheme::operator==(const FTetrisTheme& rhs) const
+{
+	return ThemeID == rhs.ThemeID;
+}
+
 //==============================================================================
 
 const TArray<FTetrisTheme>& UTetrisThemeCollection::DEFAULT()
