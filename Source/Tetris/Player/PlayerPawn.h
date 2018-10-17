@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+class UTetrisGameInstance;
 class ATetrisGameMode;
 struct FTetrisTheme;
 class ABoard;
@@ -33,6 +34,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	UTetrisGameInstance* GetTetrisGameInstance();
 	bool IsGameActive() const;
 
 	void CreateBoard();

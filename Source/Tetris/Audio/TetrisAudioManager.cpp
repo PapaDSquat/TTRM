@@ -8,15 +8,14 @@
 #include "../Settings/TetrisSettings.h"
 
 UTetrisAudioManager::UTetrisAudioManager()
-	: m_music(nullptr)
+	: m_musicAudioComponent(nullptr)
 	, m_musicCue(nullptr)
+	, m_world(nullptr)
 {
 }
 
 void UTetrisAudioManager::Initialize(const InitializeParams& params)
 {
-	m_world = params.World;
-
 	LoadSettings();
 }
 
@@ -25,51 +24,63 @@ void UTetrisAudioManager::PlaySound(USoundCue* soundCue)
 	if (!m_audioSettings.SoundEffectsEnabled)
 		return;
 
-	UGameplayStatics::PlaySound2D(m_world, soundCue);
+	UGameplayStatics::PlaySound2D(GetOuter()->GetWorld(), soundCue);
 }
 
 void UTetrisAudioManager::SetMusic(USoundCue* musicCue)
 {
+	if (m_musicCue == musicCue)
+		return;
+
 	StopMusic();
+	
 	m_musicCue = musicCue;
 	
-	if (m_music)
+	if (m_musicAudioComponent == nullptr)
 	{
-		m_music->OnAudioFinished.RemoveDynamic(this, &UTetrisAudioManager::OnMusicFinished);
+		m_musicAudioComponent = UGameplayStatics::CreateSound2D(GetOuter()->GetWorld(), m_musicCue, m_audioSettings.Volume);
+		if (m_musicAudioComponent != nullptr)
+		{
+			m_musicAudioComponent->OnAudioFinished.AddDynamic(this, &UTetrisAudioManager::OnMusicFinished);
+		}
 	}
-	
-	m_music = UGameplayStatics::CreateSound2D(m_world, m_musicCue, m_audioSettings.Volume);
-	m_music->OnAudioFinished.AddDynamic(this, &UTetrisAudioManager::OnMusicFinished);
+	else
+	{
+		m_musicAudioComponent->SetSound(m_musicCue);
+	}
 }
 
 void UTetrisAudioManager::PlayMusic()
 {
 	if (!m_audioSettings.MusicEnabled
-		|| m_musicCue == nullptr
-		|| m_music == nullptr
+		|| !IsMusicSet()
 		|| IsMusicPlaying())
 		return;
 
-	m_music->Play();
+	m_musicAudioComponent->Play();
 }
 
 void UTetrisAudioManager::StopMusic()
 {
 	if (IsMusicPlaying())
 	{
-		m_music->Stop();
+		m_musicAudioComponent->Stop();
 	}
+}
+
+bool UTetrisAudioManager::IsMusicSet()
+{
+	return m_musicAudioComponent != nullptr && m_musicCue != nullptr;
 }
 
 bool UTetrisAudioManager::IsMusicPlaying()
 {
-	return m_music != nullptr && m_musicCue != nullptr && m_music->IsPlaying();
+	return IsMusicSet() && m_musicAudioComponent->IsPlaying();
 }
 
 void UTetrisAudioManager::OnMusicFinished()
 {
-	// Loop music
-	PlayMusic();
+	PlayMusic(); // Loop music
 }
 
 bool UTetrisAudioManager::LoadSettings()

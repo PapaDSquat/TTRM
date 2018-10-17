@@ -7,11 +7,12 @@
 UTetrisGameInstance::UTetrisGameInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	//m_audioMgr = ObjectInitializer.CreateDefaultSubobject<UTetrisAudioManager>(this, TEXT("TetrisAudioManager"));
+	m_audioMgr = ObjectInitializer.CreateDefaultSubobject<UTetrisAudioManager>(this, TEXT("TetrisAudioManager"));
 }
 
 void UTetrisGameInstance::Init()
 {
-	m_audioMgr = NewObject<UTetrisAudioManager>(UTetrisAudioManager::StaticClass());
-	m_audioMgr->Initialize({ GetWorld() });
+	Super::Init();
+	
+	m_audioMgr->Initialize({});
 }

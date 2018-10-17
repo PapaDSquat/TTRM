@@ -21,7 +21,8 @@ class TETRIS_API UTetrisGameInstance : public UGameInstance
 public:
 	UTetrisGameInstance(const FObjectInitializer& ObjectInitializer);
 
-	virtual void Init();
+	// UGameInstance Interface
+	virtual void Init() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	UTetrisAudioManager* GetAudioManager() { return m_audioMgr; }

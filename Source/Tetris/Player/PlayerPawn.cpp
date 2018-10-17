@@ -4,7 +4,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Actors/Board.h"
 #include "../GameMode/TetrisGameMode.h"
+#include "../Audio/TetrisAudioManager.h"
 #include "../Theme/TetrisTheme.h"
+#include "../TetrisGameInstance.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -77,6 +79,11 @@ void APlayerPawn::ResetBoard()
 	{
 		m_board->ResetBoard();
 	}
+}
+
+UTetrisGameInstance* APlayerPawn::GetTetrisGameInstance()
+{
+	return Cast<UTetrisGameInstance>(GetGameInstance());
 }
 
 bool APlayerPawn::IsGameActive() const
@@ -152,32 +159,20 @@ void APlayerPawn::OnGameEvent(EGameEventType eventType)
 
 void APlayerPawn::OnBoardPlaceTetromino()
 {
-	if (const auto sound = m_gameMode->GetCurrentTheme().DropPieceSound)
-	{
-		UGameplayStatics::PlaySound2D(GetWorld(), sound);
-	}
+	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().DropPieceSound);
 }
 
 void APlayerPawn::OnBoardClearLines123( int8 numLines )
 {
-	if (const auto sound = m_gameMode->GetCurrentTheme().ClearLinesSound)
-	{
-		UGameplayStatics::PlaySound2D(GetWorld(), sound);
-	}
+	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().ClearLinesSound);
 }
 
 void APlayerPawn::OnBoardClearTetris()
 {
-	if (const auto sound = m_gameMode->GetCurrentTheme().TetrisSound)
-	{
-		UGameplayStatics::PlaySound2D(GetWorld(), sound);
-	}
+	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().TetrisSound);
 }
 
 void APlayerPawn::OnBoardGameOver()
 {
-	if (const auto sound = m_gameMode->GetCurrentTheme().GameOverSound)
-	{
-		UGameplayStatics::PlaySound2D(GetWorld(), sound);
-	}
+	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().GameOverSound);
 }

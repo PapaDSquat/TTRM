@@ -24,7 +24,6 @@ public:
 
 	struct InitializeParams
 	{
-		UWorld* World;
 	};
 	void Initialize( const InitializeParams& params );
 
@@ -45,6 +44,9 @@ public:
 	void StopMusic();
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
+	bool IsMusicSet();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
 	bool IsMusicPlaying();
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
@@ -63,7 +65,7 @@ private:
 	UWorld* m_world;
 
 	USoundCue* m_musicCue;
-	UAudioComponent* m_music;
+	UAudioComponent* m_musicAudioComponent;
 
 	FTetrisAudioSettings m_audioSettings;
 };
