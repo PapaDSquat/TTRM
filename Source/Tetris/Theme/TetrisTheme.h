@@ -23,10 +23,10 @@ struct FBlockTheme
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture* Texture;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Tint;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Opacity;
 };
 

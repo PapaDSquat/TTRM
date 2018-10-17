@@ -81,9 +81,9 @@ void ATetrisGameMode::StartGame()
 			SetTheme(Themes->GetTheme(DefaultThemeID), false);
 		}
 
-		// Why doesn't this work??
- 		//GetTetrisGameInstance()->GetAudioManager()->PlayMusic(m_currentTheme.Music);
-		UGameplayStatics::PlaySound2D(GetWorld(), m_currentTheme.Music);
+		const auto audioMgr = GetTetrisGameInstance()->GetAudioManager();
+		audioMgr->StopMusic();
+		audioMgr->PlayMusic();
 
 		FireGameEvent(EGameEventType::Start);
 	}
@@ -147,6 +147,7 @@ bool ATetrisGameMode::SetTheme(const FTetrisTheme& theme, bool restart /*= true*
 	if (m_currentTheme.ThemeID != theme.ThemeID)
 	{
 		m_currentTheme = theme;
+		GetTetrisGameInstance()->GetAudioManager()->SetMusic( m_currentTheme.Music );
 		OnThemeChange.Broadcast(m_currentTheme);
 		if(restart)
 			RestartGame();

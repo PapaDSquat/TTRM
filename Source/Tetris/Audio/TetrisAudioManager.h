@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Settings/TetrisAudioSettings.h"
 #include "TetrisAudioManager.generated.h"
 
 class USoundCue;
@@ -21,13 +22,48 @@ class TETRIS_API UTetrisAudioManager : public UObject
 public:
 	UTetrisAudioManager();
 
+	struct InitializeParams
+	{
+		UWorld* World;
+	};
+	void Initialize( const InitializeParams& params );
+
+	// Plays a sound effect once.
+	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
 	void PlaySound(USoundCue* soundCue);
 
-	void PlayMusic(USoundCue* musicCue);
+	// Sets the current Music cue. Does not play the Music automatically.
+	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
+	void SetMusic(USoundCue* musicCue);
+
+	// Plays the current Music cue, if any.
+	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
+	void PlayMusic();
+
+	// Stops the current Music cue, if any.
+	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
 	void StopMusic();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
 	bool IsMusicPlaying();
 
+	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
+	FTetrisAudioSettings& GetAudioSettings();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")
+	bool SaveSettings(const FTetrisAudioSettings& newSettings);
+
 private:
+	bool LoadSettings();
+
+	// Event Callbacks
+	UFUNCTION()
+	void OnMusicFinished();
+
+	UWorld* m_world;
+
 	USoundCue* m_musicCue;
 	UAudioComponent* m_music;
+
+	FTetrisAudioSettings m_audioSettings;
 };

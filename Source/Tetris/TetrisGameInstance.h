@@ -23,6 +23,7 @@ public:
 
 	virtual void Init();
 
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	UTetrisAudioManager* GetAudioManager() { return m_audioMgr; }
 
 private:

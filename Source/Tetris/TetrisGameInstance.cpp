@@ -13,4 +13,5 @@ UTetrisGameInstance::UTetrisGameInstance(const FObjectInitializer& ObjectInitial
 void UTetrisGameInstance::Init()
 {
 	m_audioMgr = NewObject<UTetrisAudioManager>(UTetrisAudioManager::StaticClass());
+	m_audioMgr->Initialize({ GetWorld() });
 }
