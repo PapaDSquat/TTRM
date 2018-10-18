@@ -98,7 +98,9 @@ private:
 	ATetromino* m_nextTetromino;
 	ATetromino* m_holdTetromino;
 	ATetromino* m_ghostTetromino;
+
 	FIntPoint m_activePosition;
+	FIntPoint m_ghostPosition;
 
 	FTimerHandle m_dropTimerHandle;
 

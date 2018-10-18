@@ -14,24 +14,19 @@ ATetromino::ATetromino()
 
 }
 
-// Called when the game starts or when spawned
+void ATetromino::Initialize(const InitializeParams& params)
+{
+	m_isGhost = params.IsGhost;
+}
+
 void ATetromino::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (Themes.Num() == 0)
-	{
-		Themes.Push(FBlockTheme()); // Create default theme
-	}
-
-	ATetrisGameMode* gameMode = (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
-	
 
 	SpawnBlocks();
 	Randomize();
 }
 
-// Called every frame
 void ATetromino::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -84,10 +79,9 @@ FIntPoint ATetromino::GetRealSize() const
 	return size;
 }
 
-void ATetromino::SetIsShadow(bool isShadow)
+void ATetromino::SetIsGhost(bool isGhost)
 {
-	// TODO
-	m_isShadow = isShadow;
+	m_isGhost = isGhost;
 }
 
 const FBlockTheme& ATetromino::GetTheme() const
@@ -99,9 +93,9 @@ void ATetromino::SetTheme(const FBlockTheme& theme)
 {
 	m_theme = theme;
 
-	if (m_isShadow)
+	if (m_isGhost)
 	{
-		m_theme.Opacity = 0.50f; // TODO: Parametrize
+		m_theme.Opacity = GetGameMode()->GetCurrentTheme().GhostPieceAlpha;
 	}
 
 	for (uint8 i = 0; i < s_totalBlocks; ++i)
@@ -118,6 +112,11 @@ ETetrominoType ATetromino::GetRandomType()
 uint8 ATetromino::GetRandomRotation()
 {
 	return FMath::RandRange(0, s_rotations - 1);
+}
+
+ATetrisGameMode* ATetromino::GetGameMode() const
+{
+	return (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
 }
 
 void ATetromino::SpawnBlocks()

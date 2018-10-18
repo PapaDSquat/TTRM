@@ -9,6 +9,7 @@
 #include "Block.h"
 #include "Tetromino.generated.h"
 
+class ATetrisGameMode;
 class ABlock;
 
 UENUM()
@@ -33,6 +34,12 @@ public:
 	// Sets default values for this actor's properties
 	ATetromino();
 
+	struct InitializeParams
+	{
+		bool IsGhost;
+	};
+	void Initialize(const InitializeParams& params);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,7 +62,7 @@ public:
 
 	ETetrominoType GetType() const;
 	void SetType(ETetrominoType type);
-	void SetIsShadow(bool isShadow);
+	void SetIsGhost(bool isGhost);
 
 	const FBlockTheme& GetTheme() const;
 	void SetTheme(const FBlockTheme& theme);
@@ -71,6 +78,8 @@ private:
 			: m_positions(positions) {}
 		TArray< FIntPoint > m_positions; // TODO: change to static array size 4
 	};
+
+	ATetrisGameMode* GetGameMode() const;
 
 	void SpawnBlocks();
 
@@ -96,18 +105,9 @@ private:
 
 	ObjectBag< FBlockTheme > m_themeBag;
 	
-	bool m_isShadow{ false };
+	bool m_isGhost{ false };
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Block")
 	TSubclassOf<ABlock> BlockClass;
-
-	UPROPERTY(EditAnywhere, AdvancedDisplay, Category = "Block")
-	TArray< FBlockTheme > Themes;
-
-	//UPROPERTY(EditAnywhere, Category = "Block")
-	//TArray< UMaterial* > AllMaterials;
-	//
-	//UPROPERTY(EditAnywhere, Category = "Block")
-	//UMaterial* ShadowMaterial;
 };

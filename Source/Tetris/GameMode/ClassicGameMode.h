@@ -25,7 +25,7 @@ public:
 	virtual void InitGameState() override;
 	
 	// ATetrisGameMode
-	virtual void OnClearLines(uint8 numLines) override;
+	virtual bool OnClearLines(uint8 numLines) override;
 
 protected:
 	// Called when the game starts or when spawned

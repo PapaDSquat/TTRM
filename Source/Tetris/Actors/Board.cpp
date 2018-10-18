@@ -65,6 +65,7 @@ void ABoard::BeginPlay()
 		{
 			m_activeTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 			m_activeTetromino->AttachToActor(this, attachRules);
+			m_activeTetromino->Initialize({});
 		}
 
 		{
@@ -73,6 +74,7 @@ void ABoard::BeginPlay()
 
 			const FVector localLocation(-1475.f, 0.f, -200.f);
 			m_nextTetromino->SetActorRelativeLocation(localLocation);
+			m_nextTetromino->Initialize({});
 		}
 
 		{
@@ -81,12 +83,13 @@ void ABoard::BeginPlay()
 
 			const FVector localLocation(-1475.f, 0.f, -900.f);
 			m_holdTetromino->SetActorRelativeLocation(localLocation);
+			m_holdTetromino->Initialize({});
 		}
 
 		{
 			m_ghostTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 			m_ghostTetromino->AttachToActor(this, attachRules);
-			m_ghostTetromino->SetIsShadow(true);
+			m_ghostTetromino->Initialize(ATetromino::InitializeParams({ true }));
 		}
 	}
 	
@@ -201,17 +204,7 @@ void ABoard::RotateCCW()
 
 void ABoard::Drop()
 {
-	// TODO: Simply copy ghost position
-
-	auto offset = FIntPoint(1, 0);
-	while (TryMoveTetromino(offset))
-	{
-		offset.X += 1;
-	}
-
-	offset.X -= 1;
-	PlaceBlocks(m_activePosition + offset);
-	OnPlaceTetromino().Broadcast();
+	PlaceBlocks(m_ghostPosition);
 	SpawnNewTetromino();
 }
 
@@ -311,7 +304,6 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 		TileData& tileData = m_grid[pos.X][pos.Y];
 
 		SetTileFilled(pos.X, pos.Y, true);
-		// TODO: Copy texture and other data
 
 		minRow = FMath::Min(minRow, pos.X);
 		maxRow = FMath::Max(maxRow, pos.X);
@@ -358,6 +350,8 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 		}
 	}
 
+	OnPlaceTetromino().Broadcast();
+
 	if (numLines > 0)
 	{
 		if (numLines == 4)
@@ -380,8 +374,6 @@ void ABoard::PlaceBlocks(const FIntPoint& position)
 	}
 	PlaceBlocks(localGridPositions);
 }
-
-
 
 void ABoard::CopyTile(const TileData& source, TileData& dest) const
 {
@@ -409,19 +401,30 @@ FBox2D ABoard::GetActiveBounds() const
 
 void ABoard::UpdateGhost()
 {
-	// Find ghost position
-	FIntPoint offset = FIntPoint((int8)s_gridRows - m_activePosition.X, 0);
+	// Find ghost position. Start at current position
+	FIntPoint offset = FIntPoint::ZeroValue;
 
-	do
+	while(TryMoveTetromino(offset))
 	{
-		--offset.X;
-	} while (!TryMoveTetromino(offset));
+		++offset.X; // Check one row down
+	}
+	--offset.X; // Move back up from where it hit
 
-	const FIntPoint ghostPosition = m_activePosition + offset;
-	const FVector location(ghostPosition.Y * 100.f, 0.f, -ghostPosition.X * 100.f);
-	m_ghostTetromino->SetActorRelativeLocation(location);
-
-	m_activeTetromino->CopyConfigTo(m_ghostTetromino);
+	m_ghostPosition = m_activePosition + offset;
+	if (m_ghostPosition == m_activePosition)
+	{
+		// We overlap ghost ghostPosition, so simply hide it.
+		// TODO: Hide any overlapping block
+		m_ghostTetromino->SetActorHiddenInGame(m_ghostPosition == m_activePosition);
+	}
+	else
+	{
+		m_ghostTetromino->SetActorHiddenInGame(false);
+		
+		const FVector location(m_ghostPosition.Y * 100.f, 0.f, -m_ghostPosition.X * 100.f);
+		m_ghostTetromino->SetActorRelativeLocation(location);
+		m_activeTetromino->CopyConfigTo(m_ghostTetromino);
+	}
 }
 
 void ABoard::ResetDropTimer()

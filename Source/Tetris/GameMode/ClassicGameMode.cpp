@@ -1,6 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ClassicGameMode.h"
+#include "../Audio/TetrisAudioManager.h"
+#include "../Theme/TetrisTheme.h"
+#include "../TetrisGameInstance.h"
 
 static const int32 s_linesPerLevel = 10;
 
@@ -21,11 +24,11 @@ void AClassicGameMode::InitGameState()
 	
 }
 
-void AClassicGameMode::OnClearLines(uint8 numLines)
+bool AClassicGameMode::OnClearLines(uint8 numLines)
 {
 	if (numLines == 0)
 	{
-		return;
+		return false;
 	}
 
 	/* 
@@ -56,7 +59,10 @@ void AClassicGameMode::OnClearLines(uint8 numLines)
 	if (newLevel > Level)
 	{
 		++Level;
+		GetTetrisGameInstance()->GetAudioManager()->PlaySound(GetCurrentTheme().LevelUpSound);
+		return true;
 	}
+	return false;
 }
 
 void AClassicGameMode::BeginPlay()

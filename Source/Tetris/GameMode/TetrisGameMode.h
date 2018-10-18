@@ -39,7 +39,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnClearLines(uint8 numLines) {}
+	// Returns true if leveled up
+	virtual bool OnClearLines(uint8 numLines) { return false; }
 
 protected:
 	UTetrisGameInstance* GetTetrisGameInstance();
