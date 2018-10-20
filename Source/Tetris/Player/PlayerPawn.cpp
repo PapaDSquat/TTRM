@@ -73,14 +73,6 @@ void APlayerPawn::CreateBoard()
 	}
 }
 
-void APlayerPawn::ResetBoard()
-{
-	if (m_board)
-	{
-		m_board->ResetBoard();
-	}
-}
-
 UTetrisGameInstance* APlayerPawn::GetTetrisGameInstance()
 {
 	return Cast<UTetrisGameInstance>(GetGameInstance());
@@ -139,7 +131,8 @@ void APlayerPawn::OnGameEvent(EGameEventType eventType)
 	{
 	case EGameEventType::Start:
 	{
-		ResetBoard();
+		m_board->SetPaused(false);
+		m_board->ResetBoard();
 	}
 	break;
 
@@ -152,6 +145,18 @@ void APlayerPawn::OnGameEvent(EGameEventType eventType)
 	case EGameEventType::Unpause:
 	{
 		m_board->SetPaused(false);
+	}
+	break;
+
+	case EGameEventType::GameOver:
+	{
+		GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().GameOverSound);
+	}
+	break;
+
+	case EGameEventType::End:
+	{
+		m_board->SetPaused(true);
 	}
 	break;
 	}

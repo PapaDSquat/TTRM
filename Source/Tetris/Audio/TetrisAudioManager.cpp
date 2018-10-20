@@ -14,6 +14,14 @@ UTetrisAudioManager::UTetrisAudioManager()
 {
 }
 
+void UTetrisAudioManager::Uninitialize()
+{
+	StopMusic();
+	m_musicAudioComponent = nullptr;
+	m_musicCue = nullptr;
+	m_world = nullptr;
+}
+
 void UTetrisAudioManager::Initialize(const InitializeParams& params)
 {
 	LoadSettings();

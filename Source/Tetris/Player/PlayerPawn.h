@@ -38,7 +38,6 @@ private:
 	bool IsGameActive() const;
 
 	void CreateBoard();
-	void ResetBoard();
 
 	// Input Interface
 	void MoveLeft();

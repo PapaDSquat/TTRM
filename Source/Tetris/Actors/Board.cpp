@@ -297,16 +297,25 @@ void ABoard::SpawnNewTetromino()
 
 void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 {
-	int32 minRow = 0;
+	int32 minRow = s_gridRows - 1;
 	int32 maxRow = 0;
 	for (auto& pos : positions)
 	{
+		if (pos.X < 0 || pos.Y < 0)
+			continue;
+
 		TileData& tileData = m_grid[pos.X][pos.Y];
 
 		SetTileFilled(pos.X, pos.Y, true);
 
 		minRow = FMath::Min(minRow, pos.X);
 		maxRow = FMath::Max(maxRow, pos.X);
+	}
+
+	if (minRow <= 0)
+	{
+		m_gameMode->GameOver();
+		return;
 	}
 
 	// Try to clear any rows affected

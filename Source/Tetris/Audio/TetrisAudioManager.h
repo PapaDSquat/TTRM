@@ -22,10 +22,9 @@ class TETRIS_API UTetrisAudioManager : public UObject
 public:
 	UTetrisAudioManager();
 
-	struct InitializeParams
-	{
-	};
-	void Initialize( const InitializeParams& params );
+	struct InitializeParams {};
+	void Initialize(const InitializeParams& params);
+	void Uninitialize();
 
 	// Plays a sound effect once.
 	UFUNCTION(BlueprintCallable, Category = "Tetris|Audio")

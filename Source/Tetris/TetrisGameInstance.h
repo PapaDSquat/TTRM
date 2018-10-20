@@ -23,6 +23,7 @@ public:
 
 	// UGameInstance Interface
 	virtual void Init() override;
+	virtual void Shutdown() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	UTetrisAudioManager* GetAudioManager() { return m_audioMgr; }

@@ -16,6 +16,7 @@ enum class EGameEventType : uint8
 {
 	Start,
 	End,
+	GameOver,
 	Restart,
 	Pause,
 	Unpause
@@ -25,10 +26,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSetThemeDelegate, const struct FTet
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStartEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameRestartEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameEndEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGamePauseEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameUnPauseEvent);
 
-UCLASS()
+UCLASS(BlueprintType)
 class TETRIS_API ATetrisGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
@@ -59,6 +61,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	void EndGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	void GameOver();
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	void RestartGame();
@@ -129,6 +134,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FGameEndEvent OnGameEnd;
+
+	UPROPERTY(BlueprintAssignable)
+	FGameOverEvent OnGameOver;
 
 	UPROPERTY(BlueprintAssignable)
 	FGamePauseEvent OnGamePause;

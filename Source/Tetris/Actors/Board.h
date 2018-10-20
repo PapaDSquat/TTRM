@@ -32,6 +32,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void ResetBoard();
+	void StopGame();
 
 	// Input Interface
 	void SetPaused(bool paused);

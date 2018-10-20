@@ -48,6 +48,7 @@ void ATetrisGameMode::FireGameEvent(EGameEventType eventType)
 	case EGameEventType::Start: OnGameStart.Broadcast(); break;
 	case EGameEventType::Restart: OnGameRestart.Broadcast(); break;
 	case EGameEventType::End: OnGameEnd.Broadcast(); break;
+	case EGameEventType::GameOver: OnGameOver.Broadcast(); break;
 	case EGameEventType::Pause: OnGamePause.Broadcast(); break;
 	case EGameEventType::Unpause: OnGameUnPause.Broadcast(); break;
 	}
@@ -94,8 +95,15 @@ void ATetrisGameMode::EndGame()
 	if (m_gameStarted)
 	{
 		m_gameStarted = false;
+		GetTetrisGameInstance()->GetAudioManager()->StopMusic();
 		FireGameEvent(EGameEventType::End);
 	}
+}
+
+void ATetrisGameMode::GameOver()
+{
+	EndGame();
+	FireGameEvent(EGameEventType::GameOver);
 }
 
 void ATetrisGameMode::RestartGame()

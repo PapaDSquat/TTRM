@@ -16,3 +16,10 @@ void UTetrisGameInstance::Init()
 	
 	m_audioMgr->Initialize({});
 }
+
+void UTetrisGameInstance::Shutdown()
+{
+	m_audioMgr->Uninitialize();
+
+	Super::Shutdown();
+}
