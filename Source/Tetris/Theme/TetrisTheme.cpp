@@ -28,14 +28,14 @@ void UTetrisThemeCollection::PostLoad()
 	// Maybe a bad idea...shouldn't happen when we load the asset in Editor
 	for (FTetrisTheme& theme : Themes)
 	{
-		if (theme.BlockTexture == nullptr)
+		if (theme.SingleBlockTexture == nullptr)
 			continue; 
 
-		for (FBlockTheme& blockTheme : theme.BlockColors)
+		for (FBlockTheme& blockTheme : theme.BlockThemes)
 		{
-			if (blockTheme.Texture == nullptr)
+			if (blockTheme.MaterialParams.Texture == nullptr)
 			{
-				blockTheme.Texture = theme.BlockTexture;
+				blockTheme.MaterialParams.Texture = theme.SingleBlockTexture;
 			}
 		}
 	}
@@ -45,7 +45,7 @@ const FTetrisTheme& UTetrisThemeCollection::GetTheme(const FName& themeName) con
 {
 	const FTetrisTheme* foundTheme = Themes.FindByPredicate([themeName](const FTetrisTheme& theme)
 	{
-		return theme.ThemeID == themeName;
+		return theme.ThemeID == themeName || theme.ThemeName == themeName;
 	});
 
 	if (foundTheme)

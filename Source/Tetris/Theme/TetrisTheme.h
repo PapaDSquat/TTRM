@@ -9,17 +9,19 @@
 #include "Sound/SoundCue.h"
 #include "TetrisTheme.generated.h"
 
+
+
 USTRUCT(BlueprintType)
-struct FBlockTheme
+struct FThemeMaterialParams
 {
 	GENERATED_USTRUCT_BODY()
 
-	FBlockTheme()
+		FThemeMaterialParams()
 		: Tint(FColor::White)
 		, Opacity(1.f)
 	{}
 
-
+	// Overrides FTetrisTheme::BlockTexture, if specified
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture* Texture;
 
@@ -31,6 +33,18 @@ struct FBlockTheme
 };
 
 USTRUCT(BlueprintType)
+struct FBlockTheme
+{
+	GENERATED_USTRUCT_BODY()
+
+	FBlockTheme()
+	{}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FThemeMaterialParams MaterialParams;
+};
+
+USTRUCT(BlueprintType)
 struct TETRIS_API FTetrisTheme
 {
 	GENERATED_USTRUCT_BODY()
@@ -38,7 +52,6 @@ struct TETRIS_API FTetrisTheme
 	static const FTetrisTheme& DEFAULT();
 
 	FTetrisTheme()
-		: GhostPieceAlpha( 0.5f )
 	{}
 
 	bool operator == (const FTetrisTheme& rhs) const;
@@ -46,23 +59,36 @@ struct TETRIS_API FTetrisTheme
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
 	FName ThemeID;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
+	FName ThemeName;
+
 	/*
-	Graphics
+	** GRAPHICS
+	*/
+
+	/*
+	**	Uses the same block texture for every Tetromino type. Can be overriden individually in BlockThemes.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
-	UTexture* BlockTexture;
+	UTexture* SingleBlockTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
-	TArray<FBlockTheme> BlockColors;
+	TArray<FBlockTheme> BlockThemes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
-	UTexture* BackgroundTexture;
+	FThemeMaterialParams BackgroundTheme;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
-	UTexture* BorderTexture;
+	FThemeMaterialParams BorderTheme;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
-	float GhostPieceAlpha;
+	FThemeMaterialParams BackTheme;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Graphics")
+	FThemeMaterialParams GhostPieceTheme;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FThemeMaterialParams GameOverPieceTheme;
 
 	/*
 	Audio

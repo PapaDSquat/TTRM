@@ -42,17 +42,18 @@ void ABlock::SetTheme(const FBlockTheme& theme)
 
 	if (m_meshComponent)
 	{
-		m_meshComponent->SetVectorParameterValueOnMaterials(FName(TEXT("Tint")), FVector( m_theme.Tint ));
-		m_meshComponent->SetScalarParameterValueOnMaterials(FName(TEXT("Opacity")), m_theme.Opacity);
+		// TODO: Move to BP
+		m_meshComponent->SetVectorParameterValueOnMaterials(FName(TEXT("Tint")), FVector( m_theme.MaterialParams.Tint ));
+		m_meshComponent->SetScalarParameterValueOnMaterials(FName(TEXT("Opacity")), m_theme.MaterialParams.Opacity);
 		
-		if (m_theme.Texture != nullptr)
+		if (m_theme.MaterialParams.Texture != nullptr)
 		{
 			const int32 matCount = m_meshComponent->GetNumMaterials();
 			for (int32 i = 0; i < matCount; ++i)
 			{
 				if (UMaterialInstanceDynamic* material = Cast<UMaterialInstanceDynamic>(m_meshComponent->GetMaterial(i)))
 				{
-					material->SetTextureParameterValue("Texture", m_theme.Texture);
+					material->SetTextureParameterValue("Texture", m_theme.MaterialParams.Texture);
 				}
 			}
 		}

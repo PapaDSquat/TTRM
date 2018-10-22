@@ -95,7 +95,8 @@ void ATetromino::SetTheme(const FBlockTheme& theme)
 
 	if (m_isGhost)
 	{
-		m_theme.Opacity = GetGameMode()->GetCurrentTheme().GhostPieceAlpha;
+		// TODO: Set other material params
+		m_theme.MaterialParams.Opacity = GetGameMode()->GetCurrentTheme().GhostPieceTheme.Opacity;
 	}
 
 	for (uint8 i = 0; i < s_totalBlocks; ++i)

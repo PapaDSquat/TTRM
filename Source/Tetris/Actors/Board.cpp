@@ -118,7 +118,7 @@ void ABoard::ResetBoard()
 
 	static int8 s_themeCopies = 3;
 	m_themeBag.Empty();
-	m_themeBag.Add(m_gameMode->GetCurrentTheme().BlockColors, 2);
+	m_themeBag.Add(m_gameMode->GetCurrentTheme().BlockThemes, 2);
 
 	m_nextTetromino->Randomize();
 	m_nextTetromino->SetTheme(GetRandomBlockTheme());
