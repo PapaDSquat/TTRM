@@ -57,10 +57,6 @@ public:
 private:
 	bool LoadSettings();
 
-	// Event Callbacks
-	UFUNCTION()
-	void OnMusicFinished();
-
 	UWorld* m_world;
 
 	USoundCue* m_musicCue;

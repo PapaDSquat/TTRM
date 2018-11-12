@@ -16,10 +16,7 @@ UTetrisAudioManager::UTetrisAudioManager()
 
 void UTetrisAudioManager::Uninitialize()
 {
-	StopMusic();
-	m_musicAudioComponent = nullptr;
-	m_musicCue = nullptr;
-	m_world = nullptr;
+	// Music is stopped automatically
 }
 
 void UTetrisAudioManager::Initialize(const InitializeParams& params)
@@ -47,10 +44,6 @@ void UTetrisAudioManager::SetMusic(USoundCue* musicCue)
 	if (m_musicAudioComponent == nullptr)
 	{
 		m_musicAudioComponent = UGameplayStatics::CreateSound2D(GetOuter()->GetWorld(), m_musicCue, m_audioSettings.Volume);
-		if (m_musicAudioComponent != nullptr)
-		{
-			m_musicAudioComponent->OnAudioFinished.AddDynamic(this, &UTetrisAudioManager::OnMusicFinished);
-		}
 	}
 	else
 	{
@@ -84,11 +77,6 @@ bool UTetrisAudioManager::IsMusicSet()
 bool UTetrisAudioManager::IsMusicPlaying()
 {
 	return IsMusicSet() && m_musicAudioComponent->IsPlaying();
-}
-
-void UTetrisAudioManager::OnMusicFinished()
-{
-	PlayMusic(); // Loop music
 }
 
 bool UTetrisAudioManager::LoadSettings()
