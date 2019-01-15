@@ -28,11 +28,7 @@ void AClassicGameMode::InitGameState()
 
 bool AClassicGameMode::OnClearLines(APlayerPawn* playerPawn, uint8 numLines)
 {
-	if (numLines == 0)
-		return false;
-
-	ATetrisPlayerState* playerState = Cast<ATetrisPlayerState>(playerPawn->PlayerState);
-	if (!playerState)
+	if (!playerPawn || numLines == 0)
 		return false;
 
 	/* 
@@ -45,7 +41,7 @@ bool AClassicGameMode::OnClearLines(APlayerPawn* playerPawn, uint8 numLines)
 	Formula: (points for # of lines) * (Level + 1)
 	*/
 
-	FPlayerRoundStats& stats = playerState->GetRoundStats();
+	FPlayerRoundStats& stats = playerPawn->GetRoundStats();
 
 	int32 linePointsMultiplier = 0;
 	switch (numLines)
@@ -71,18 +67,16 @@ bool AClassicGameMode::OnClearLines(APlayerPawn* playerPawn, uint8 numLines)
 	return false;
 }
 
-void AClassicGameMode::BeginPlay()
+float AClassicGameMode::GetGameSpeed(APlayerPawn* playerPawn) const
 {
-	Super::BeginPlay();
+	if (!playerPawn) return Super::GetGameSpeed(playerPawn);
+	const FPlayerRoundStats& stats = playerPawn->GetRoundStats();
+	return stats.Level + 1;
 }
 
-float AClassicGameMode::GetGameSpeed() const
+float AClassicGameMode::GetTetrominoDropTime(APlayerPawn* playerPawn) const
 {
-	return Level + 1;
-}
-
-float AClassicGameMode::GetTetrominoDropTime() const
-{
-	return InitialTetrominoDropTime / (GetGameSpeed());
+	if (!playerPawn) return Super::GetTetrominoDropTime(playerPawn);
+	return InitialTetrominoDropTime / GetGameSpeed(playerPawn);
 }
 

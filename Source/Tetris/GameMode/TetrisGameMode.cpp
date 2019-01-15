@@ -202,12 +202,12 @@ bool ATetrisGameMode::SetTheme(const FTetrisTheme& theme, bool restart /*= true*
 	return false;
 }
 
-float ATetrisGameMode::GetGameSpeed() const
+float ATetrisGameMode::GetGameSpeed(APlayerPawn* playerPawn) const
 {
 	return InitialGameSpeed;
 }
 
-float ATetrisGameMode::GetTetrominoDropTime() const
+float ATetrisGameMode::GetTetrominoDropTime(APlayerPawn* playerPawn) const
 {
 	return InitialTetrominoDropTime;
 }

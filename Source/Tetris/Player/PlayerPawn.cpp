@@ -2,6 +2,7 @@
 
 #include "PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "../Player/TetrisPlayerState.h"
 #include "../Actors/Board.h"
 #include "../GameMode/TetrisGameMode.h"
 #include "../Audio/TetrisAudioManager.h"
@@ -236,4 +237,9 @@ void APlayerPawn::OnBoardClearTetris()
 void APlayerPawn::OnBoardGameOver()
 {
 	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().GameOverSound);
+}
+
+FPlayerRoundStats& APlayerPawn::GetRoundStats() const
+{
+	return Cast<ATetrisPlayerState>(PlayerState)->GetRoundStats();
 }

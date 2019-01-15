@@ -440,7 +440,7 @@ void ABoard::ResetDescendTimer()
 	auto& timeMgr = GetWorldTimerManager();
 	const bool wasPaused = timeMgr.IsTimerPaused(m_descendTimerHandle);
 	timeMgr.ClearTimer(m_descendTimerHandle);
-	timeMgr.SetTimer(m_descendTimerHandle, this, &ABoard::OnDescendTimer, m_gameMode->GetTetrominoDropTime(), true, 0.0f);
+	timeMgr.SetTimer(m_descendTimerHandle, this, &ABoard::OnDescendTimer, m_gameMode->GetTetrominoDropTime(GetOwnerPawn()), true, 0.0f);
 	if (wasPaused)
 		timeMgr.PauseTimer(m_descendTimerHandle);
 }

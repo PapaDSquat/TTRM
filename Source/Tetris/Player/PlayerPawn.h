@@ -11,6 +11,7 @@ class ATetrisGameMode;
 struct FTetrisTheme;
 class ABoard;
 class UUserWidget;
+struct FPlayerRoundStats;
 enum class EGameEventType : uint8;
 
 enum class EMoveDirection
@@ -80,6 +81,8 @@ private:
 	EMoveDirection m_lastMoveDirection{ EMoveDirection::MAX };
 
 public:
+	FPlayerRoundStats& GetRoundStats() const;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
 	ABoard*	Board;
 

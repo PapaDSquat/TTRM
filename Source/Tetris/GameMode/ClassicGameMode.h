@@ -26,16 +26,10 @@ public:
 	
 	// ATetrisGameMode
 	virtual bool OnClearLines(APlayerPawn* playerPawn, uint8 numLines) override;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual float GetGameSpeed(APlayerPawn* playerPawn) const override;
+	virtual float GetTetrominoDropTime(APlayerPawn* playerPawn) const override;
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "Tetris")
-	virtual float GetGameSpeed() const override;
-	virtual float GetTetrominoDropTime() const;
-
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
 	int32 Level;
 

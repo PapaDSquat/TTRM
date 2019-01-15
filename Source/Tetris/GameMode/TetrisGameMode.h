@@ -44,6 +44,8 @@ public:
 
 	// Returns true if leveled up
 	virtual bool OnClearLines(APlayerPawn* playerPawn, uint8 numLines) { return false; }
+	virtual float GetGameSpeed(APlayerPawn* playerPawn) const;
+	virtual float GetTetrominoDropTime(APlayerPawn* playerPawn) const;
 
 protected:
 	UTetrisGameInstance* GetTetrisGameInstance();
@@ -109,10 +111,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
 	FName DefaultThemeID;
-
-	UFUNCTION(BlueprintCallable, Category = "Tetris")
-	virtual float GetGameSpeed() const;
-	virtual float GetTetrominoDropTime() const;
 
 	// TODO: Multiple Players. Group stats into each.
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
