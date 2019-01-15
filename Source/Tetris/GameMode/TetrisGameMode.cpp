@@ -223,6 +223,10 @@ FString ATetrisGameMode::GetRoundTimeString() const
 	minutes.RemoveAt(0);
 	seconds.RemoveAt(0);
 	
-	const FString outputStr = hours + ":" + minutes + ":" + seconds;
+	FString outputStr;
+	if (hours == "0" || hours == "00")
+		outputStr = minutes + ":" + seconds;
+	else
+		outputStr = hours + ":" + minutes + ":" + seconds;
 	return outputStr;
 }
