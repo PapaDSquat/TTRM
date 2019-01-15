@@ -13,6 +13,7 @@ struct FBlockTheme;
 class ATetromino;
 class ATetrisGameMode;
 enum class ETetrominoType : int8;
+class APlayerPawn;
 
 UCLASS()
 class TETRIS_API ABoard : public AActor
@@ -63,6 +64,8 @@ private:
 		bool filled;
 		ABlock* block;
 	};
+
+	APlayerPawn* GetOwnerPawn();
 
 	void OnDescendTimer();
 

@@ -7,7 +7,7 @@
 #include "TetrisGameMode.h"
 #include "ClassicGameMode.generated.h"
 
-
+class APlayerPawn;
 
 /**
  * 
@@ -25,7 +25,7 @@ public:
 	virtual void InitGameState() override;
 	
 	// ATetrisGameMode
-	virtual bool OnClearLines(uint8 numLines) override;
+	virtual bool OnClearLines(APlayerPawn* playerPawn, uint8 numLines) override;
 
 protected:
 	// Called when the game starts or when spawned

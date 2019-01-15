@@ -4,6 +4,7 @@
 
 #include "../Actors/Block.h"
 #include "../Actors/Tetromino.h"
+#include "../Player/PlayerPawn.h"
 #include "../GameMode/TetrisGameMode.h"
 
 
@@ -72,16 +73,16 @@ void ABoard::BeginPlay()
 			m_nextTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 			m_nextTetromino->AttachToActor(this, attachRules);
 
-			const FVector localLocation(-1475.f, 0.f, -200.f);
+			const FVector localLocation(1250.f, 0.f, -200.f);
 			m_nextTetromino->SetActorRelativeLocation(localLocation);
 			m_nextTetromino->Initialize({});
 		}
 
 		{
+			const FVector localLocation(-650.f, 0.f, -200.f);
 			m_holdTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 			m_holdTetromino->AttachToActor(this, attachRules);
 
-			const FVector localLocation(-1475.f, 0.f, -900.f);
 			m_holdTetromino->SetActorRelativeLocation(localLocation);
 			m_holdTetromino->Initialize({});
 		}
@@ -229,6 +230,11 @@ void ABoard::Hold()
 	UpdateGhost();
 }
 
+APlayerPawn* ABoard::GetOwnerPawn()
+{
+	return Cast<APlayerPawn>(GetOwner());
+}
+
 void ABoard::OnDescendTimer()
 {
 	MoveDown();
@@ -368,8 +374,7 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 		else
 			OnClearLines123().Broadcast(numLines);
 
-		// TODO: Game Mode should listen to event
-		m_gameMode->OnClearLines(numLines);
+		m_gameMode->OnClearLines(GetOwnerPawn(), numLines);
 		ResetDropTimer();
 	}
 }

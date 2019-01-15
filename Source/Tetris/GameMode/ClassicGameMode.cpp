@@ -3,6 +3,8 @@
 #include "ClassicGameMode.h"
 #include "../Audio/TetrisAudioManager.h"
 #include "../Theme/TetrisTheme.h"
+#include "../Player/TetrisPlayerState.h"
+#include "../Player/PlayerPawn.h"
 #include "../TetrisGameInstance.h"
 
 static const int32 s_linesPerLevel = 10;
@@ -24,12 +26,14 @@ void AClassicGameMode::InitGameState()
 	
 }
 
-bool AClassicGameMode::OnClearLines(uint8 numLines)
+bool AClassicGameMode::OnClearLines(APlayerPawn* playerPawn, uint8 numLines)
 {
 	if (numLines == 0)
-	{
 		return false;
-	}
+
+	ATetrisPlayerState* playerState = Cast<ATetrisPlayerState>(playerPawn->PlayerState);
+	if (!playerState)
+		return false;
 
 	/* 
 	Original Tetris scoring system from: http://tetris.wikia.com/wiki/Scoring
@@ -41,6 +45,8 @@ bool AClassicGameMode::OnClearLines(uint8 numLines)
 	Formula: (points for # of lines) * (Level + 1)
 	*/
 
+	FPlayerRoundStats& stats = playerState->GetRoundStats();
+
 	int32 linePointsMultiplier = 0;
 	switch (numLines)
 	{
@@ -49,16 +55,16 @@ bool AClassicGameMode::OnClearLines(uint8 numLines)
 	case 3: linePointsMultiplier = 300; break;
 	case 4: linePointsMultiplier = 1200; break;
 	}
-	Lines += numLines;
+	stats.Lines += numLines;
 
 	// TODO: Should the score be split if leveling up during it?
-	const int32 scoreAdded = linePointsMultiplier * (Level + 1);
-	Score += scoreAdded;
+	const int32 scoreAdded = linePointsMultiplier * (stats.Level + 1);
+	stats.Score += scoreAdded;
 
-	const int32 newLevel = Lines / s_linesPerLevel;
-	if (newLevel > Level)
+	const int32 newLevel = stats.Lines / s_linesPerLevel;
+	if (newLevel > stats.Level)
 	{
-		++Level;
+		++stats.Level;
 		GetTetrisGameInstance()->GetAudioManager()->PlaySound(GetCurrentTheme().LevelUpSound);
 		return true;
 	}

@@ -8,6 +8,7 @@
 #include "../Tetris/Theme/TetrisTheme.h"
 #include "TetrisGameMode.generated.h"
 
+class APlayerPawn;
 class UTetrisGameInstance;
 struct FTetrisTheme;
 
@@ -42,7 +43,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Returns true if leveled up
-	virtual bool OnClearLines(uint8 numLines) { return false; }
+	virtual bool OnClearLines(APlayerPawn* playerPawn, uint8 numLines) { return false; }
 
 protected:
 	UTetrisGameInstance* GetTetrisGameInstance();
@@ -85,6 +86,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Tetris")
 	int32 InitialTetrominoDropTime;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
+	int32 NumPlayers;
+
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	void SetNumPlayers( int32 num );
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	const FTetrisTheme& GetCurrentTheme() const;

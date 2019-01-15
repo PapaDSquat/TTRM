@@ -8,14 +8,16 @@
 #include "../Theme/TetrisTheme.h"
 #include "../TetrisGameInstance.h"
 
-// Sets default values
+namespace
+{
+	static float s_timeBetweenHoldMoves = 0.1f;
+}
+
 APlayerPawn::APlayerPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
@@ -23,53 +25,65 @@ void APlayerPawn::BeginPlay()
 	m_gameMode = (ATetrisGameMode*)GetWorld()->GetAuthGameMode();
 	m_gameMode->OnGameEvent().AddUObject(this, &APlayerPawn::OnGameEvent);
 
-	CreateBoard();
+	SetupBoard();
 
 	m_gameMode->StartGame();
 }
 
-// Called every frame
 void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// TODO: Move to GameMode
-
-
+	// Update inputs
+	if (m_timeBeforeMoveH > 0.f) m_timeBeforeMoveH -= DeltaTime;
+	if (m_timeBeforeMoveV > 0.f) m_timeBeforeMoveV -= DeltaTime;
 }
 
-// Called to bind functionality to input
 void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("MoveLeft", IE_Pressed, this, &APlayerPawn::MoveLeft);
+	PlayerInputComponent->BindAction("MoveLeft", IE_Repeat, this, &APlayerPawn::MoveLeftHold);
+	PlayerInputComponent->BindAxis("MoveAxisHorizontal", this, &APlayerPawn::MoveAxisHorizontal);
 	PlayerInputComponent->BindAction("MoveRight", IE_Pressed, this, &APlayerPawn::MoveRight);
+	PlayerInputComponent->BindAction("MoveRight", IE_Repeat, this, &APlayerPawn::MoveRightHold);
+	PlayerInputComponent->BindAxis("MoveAxisVertical", this, &APlayerPawn::MoveAxisVertical);
 	PlayerInputComponent->BindAction("MoveDown", IE_Pressed, this, &APlayerPawn::MoveDown);
+	PlayerInputComponent->BindAction("MoveDown", IE_Repeat, this, &APlayerPawn::MoveDownHold);
 	PlayerInputComponent->BindAction("RotateCW", IE_Pressed, this, &APlayerPawn::RotateCW);
 	PlayerInputComponent->BindAction("RotateCCW", IE_Pressed, this, &APlayerPawn::RotateCCW);
 	PlayerInputComponent->BindAction("Drop", IE_Pressed, this, &APlayerPawn::Drop);
 	PlayerInputComponent->BindAction("Hold", IE_Pressed, this, &APlayerPawn::Hold);
 }
 
-void APlayerPawn::CreateBoard()
+void APlayerPawn::SetupBoard()
 {
-	if (BoardClass != nullptr)
+	if (UChildActorComponent* comp = Cast<UChildActorComponent>(GetComponentByClass(UChildActorComponent::StaticClass())))
+	{
+		Board = Cast<ABoard>(comp->GetChildActor());
+	}
+
+	if (Board == nullptr && BoardClass != nullptr)
 	{
 		FVector location(0.0f, 0.0f, 0.0f);
 		FRotator rotation(0.0f, 0.0f, 0.0f);
 		FActorSpawnParameters spawnInfo;
 		spawnInfo.Owner = this;
-		m_board = GetWorld()->SpawnActor< ABoard >(BoardClass, location, rotation, spawnInfo);
+		Board = GetWorld()->SpawnActor< ABoard >(BoardClass, location, rotation, spawnInfo);
+	}
 
+	if( Board )
+	{
 		FAttachmentTransformRules attachRules(EAttachmentRule::KeepRelative, false);
-		m_board->AttachToActor(this, attachRules);
+		Board->AttachToActor(this, attachRules);
+		Board->SetOwner(this);
 
 		// Bind to events
-		m_board->OnPlaceTetromino().AddUObject(this, &APlayerPawn::OnBoardPlaceTetromino);
-		m_board->OnClearLines123().AddUObject(this, &APlayerPawn::OnBoardClearLines123);
-		m_board->OnClearTetris().AddUObject(this, &APlayerPawn::OnBoardClearTetris);
-		m_board->OnGameOver().AddUObject(this, &APlayerPawn::OnBoardGameOver);
+		Board->OnPlaceTetromino().AddUObject(this, &APlayerPawn::OnBoardPlaceTetromino);
+		Board->OnClearLines123().AddUObject(this, &APlayerPawn::OnBoardClearLines123);
+		Board->OnClearTetris().AddUObject(this, &APlayerPawn::OnBoardClearTetris);
+		Board->OnGameOver().AddUObject(this, &APlayerPawn::OnBoardGameOver);
 	}
 }
 
@@ -86,43 +100,85 @@ bool APlayerPawn::IsGameActive() const
 void APlayerPawn::MoveLeft()
 {
 	if (!IsGameActive()) return;
-	if (m_board) m_board->MoveLeft();
+	if (Board) Board->MoveLeft();
+	m_timeBeforeMoveH = s_timeBetweenHoldMoves;
+	m_lastMoveDirection = EMoveDirection::Left;
 }
-
 void APlayerPawn::MoveRight()
 {
 	if (!IsGameActive()) return;
-	if (m_board) m_board->MoveRight();
+	if (Board) Board->MoveRight();
+	m_timeBeforeMoveH = s_timeBetweenHoldMoves;
+	m_lastMoveDirection = EMoveDirection::Right;
 }
-
 void APlayerPawn::MoveDown()
 {
 	if (!IsGameActive()) return;
-	if (m_board) m_board->MoveDown();
+	if (Board) Board->MoveDown();
+	m_timeBeforeMoveV = s_timeBetweenHoldMoves;
+	m_lastMoveDirection = EMoveDirection::Down;
+}
+
+void APlayerPawn::MoveLeftHold()
+{
+	if (CanAxisMove(EMoveDirection::Left)) MoveLeft();
+}
+void APlayerPawn::MoveRightHold()
+{
+	if (CanAxisMove(EMoveDirection::Right)) MoveRight();
+}
+void APlayerPawn::MoveDownHold()
+{
+	if (CanAxisMove(EMoveDirection::Down)) MoveDown();
+}
+
+void APlayerPawn::MoveAxisHorizontal(float value)
+{
+	if (value < 0.f) MoveLeftHold();
+	else if (value > 0.f) MoveRightHold();
+}
+void APlayerPawn::MoveAxisVertical(float value)
+{
+	if (value == 0.f)
+		m_canAxisDrop = true;
+	else if( value < 0.f ) 
+		MoveDownHold();
+	else if (value > 0.f && m_canAxisDrop)
+		Drop();
 }
 
 void APlayerPawn::RotateCW()
 {
 	if (!IsGameActive()) return;
-	if (m_board) m_board->RotateCW();
+	if (Board) Board->RotateCW();
 }
 
 void APlayerPawn::RotateCCW()
 {
 	if (!IsGameActive()) return;
-	if (m_board) m_board->RotateCCW();
+	if (Board) Board->RotateCCW();
 }
 
 void APlayerPawn::Drop()
 {
 	if (!IsGameActive()) return;
-	if (m_board) m_board->Drop();
+	if (Board) Board->Drop();
+	m_canAxisDrop = false;
 }
 
 void APlayerPawn::Hold()
 {
 	if (!IsGameActive()) return;
-	if (m_board) m_board->Hold();
+	if (Board) Board->Hold();
+}
+
+bool APlayerPawn::CanAxisMove(EMoveDirection direction) const
+{
+	//if (direction != m_lastMoveDirection) 
+	//	return true;
+	if (direction == EMoveDirection::Down)
+		return m_timeBeforeMoveV <= 0.f;
+	return m_timeBeforeMoveH <= 0.f;
 }
 
 void APlayerPawn::OnGameEvent(EGameEventType eventType)
@@ -131,20 +187,20 @@ void APlayerPawn::OnGameEvent(EGameEventType eventType)
 	{
 	case EGameEventType::Start:
 	{
-		m_board->SetPaused(false);
-		m_board->ResetBoard();
+		Board->SetPaused(false);
+		Board->ResetBoard();
 	}
 	break;
 
 	case EGameEventType::Pause:
 	{
-		m_board->SetPaused(true);
+		Board->SetPaused(true);
 	}
 	break;
 
 	case EGameEventType::Unpause:
 	{
-		m_board->SetPaused(false);
+		Board->SetPaused(false);
 	}
 	break;
 
@@ -156,7 +212,7 @@ void APlayerPawn::OnGameEvent(EGameEventType eventType)
 
 	case EGameEventType::End:
 	{
-		m_board->SetPaused(true);
+		Board->SetPaused(true);
 	}
 	break;
 	}

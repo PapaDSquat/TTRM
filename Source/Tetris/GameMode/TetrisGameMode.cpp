@@ -5,10 +5,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Theme/TetrisTheme.h"
 #include "../Audio/TetrisAudioManager.h"
+#include "../Player/TetrisPlayerState.h"
 #include "../TetrisGameInstance.h"
 
 ATetrisGameMode::ATetrisGameMode()
-	: Lines(0)
+	: NumPlayers(1)
+	, Lines(0)
 	, Score(0)
 	, InitialGameSpeed(1.f)
 	, InitialTetrominoDropTime(1.f)
@@ -17,6 +19,10 @@ ATetrisGameMode::ATetrisGameMode()
 {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	PrimaryActorTick.bCanEverTick = true;
+
+	PlayerStateClass = ATetrisPlayerState::StaticClass();
+
+	
 }
 
 void ATetrisGameMode::BeginPlay()
@@ -86,6 +92,11 @@ void ATetrisGameMode::StartGame()
 		audioMgr->StopMusic();
 		audioMgr->PlayMusic();
 
+		if (NumPlayers)
+		{
+
+		}
+
 		FireGameEvent(EGameEventType::Start);
 	}
 }
@@ -139,6 +150,33 @@ bool ATetrisGameMode::IsGameStarted() const
 bool ATetrisGameMode::IsGamePaused() const
 {
 	return m_gamePaused;
+}
+
+void ATetrisGameMode::SetNumPlayers(int32 num)
+{
+	if (NumPlayers == num)
+		return;
+
+	if (NumPlayers < num )
+	{
+		// Create players
+		for (int32 i = NumPlayers; i < num; ++i)
+		{
+			UGameplayStatics::CreatePlayer(GetWorld(), i);
+		}
+	}
+	else if(NumPlayers > num)
+	{
+		// Remove players
+		for (int32 i = NumPlayers -1; i >= num; --i)
+		{
+			UGameplayStatics::RemovePlayer(UGameplayStatics::GetPlayerController(GetWorld(),i),true);
+		}
+	}
+
+	NumPlayers = num;
+
+	RestartGame();
 }
 
 bool ATetrisGameMode::SetTheme(const FName& themeID)

@@ -10,7 +10,16 @@ class UTetrisGameInstance;
 class ATetrisGameMode;
 struct FTetrisTheme;
 class ABoard;
+class UUserWidget;
 enum class EGameEventType : uint8;
+
+enum class EMoveDirection
+{
+	Left,
+	Right,
+	Down,
+	MAX
+};
 
 UCLASS()
 class TETRIS_API APlayerPawn : public APawn
@@ -37,16 +46,22 @@ private:
 	UTetrisGameInstance* GetTetrisGameInstance();
 	bool IsGameActive() const;
 
-	void CreateBoard();
+	void SetupBoard();
 
 	// Input Interface
 	void MoveLeft();
+	void MoveLeftHold();
+	void MoveAxisHorizontal(float value);
 	void MoveRight();
+	void MoveRightHold();
+	void MoveAxisVertical(float value);
 	void MoveDown();
+	void MoveDownHold();
 	void RotateCW();
 	void RotateCCW();
 	void Drop();
 	void Hold();
+	bool CanAxisMove(EMoveDirection direction) const;
 
 	// Event Callbacks
 	void OnGameEvent(EGameEventType eventType);
@@ -58,7 +73,16 @@ private:
 	ATetrisGameMode* m_gameMode;
 	ABoard* m_board;
 
+	// Input Improvements
+	float m_timeBeforeMoveH{ 0.f };
+	float m_timeBeforeMoveV{ 0.f };
+	bool m_canAxisDrop{ 0.f };
+	EMoveDirection m_lastMoveDirection{ EMoveDirection::MAX };
+
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
+	ABoard*	Board;
+
 	UPROPERTY(EditAnywhere, Category = "Tetris Actors")
 	TSubclassOf<ABoard> BoardClass;
 
