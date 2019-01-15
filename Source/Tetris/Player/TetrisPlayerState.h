@@ -38,7 +38,7 @@ class TETRIS_API ATetrisPlayerState : public APlayerState
 public:
 	ATetrisPlayerState();
 
-	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	UFUNCTION(BlueprintGetter, Category = "Tetris")
 	FPlayerRoundStats& GetRoundStats();
 	
 private:
