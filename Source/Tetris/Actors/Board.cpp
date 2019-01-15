@@ -127,23 +127,19 @@ void ABoard::ResetBoard()
 
 	m_holdTetromino->SetType(ETetrominoType::Count);
 
-	m_activePosition.X = 0;
-	m_activePosition.Y = s_gridCols / 2;
-
 	SpawnNewTetromino();
-	RepositionActiveTetromino();
-	ResetDropTimer();
+	ResetDescendTimer();
 }
 
 void ABoard::SetPaused(bool paused)
 {
 	if (paused)
 	{
-		GetWorldTimerManager().PauseTimer(m_dropTimerHandle);
+		GetWorldTimerManager().PauseTimer(m_descendTimerHandle);
 	}
 	else
 	{
-		GetWorldTimerManager().UnPauseTimer(m_dropTimerHandle);
+		GetWorldTimerManager().UnPauseTimer(m_descendTimerHandle);
 	}
 }
 
@@ -216,12 +212,15 @@ void ABoard::Hold()
 
 	if( m_holdTetromino->GetType() == ETetrominoType::Count )
 	{
+		// First hold, so copy the piece and spawn a new one
 		m_activeTetromino->CopyConfigTo(m_holdTetromino);
 		SpawnNewTetromino();
 	}
 	else
 	{
+		// Otherwise swap, and reset position
 		m_activeTetromino->SwapConfig(m_holdTetromino);
+		ResetActivePosition();
 	}
 
 	// Need to place a piece in order to re-active hold
@@ -243,12 +242,13 @@ void ABoard::OnDescendTimer()
 
 void ABoard::SetActivePosition(const FIntPoint& newPosition)
 {
-	if (m_activePosition != newPosition)
-	{
-		m_activePosition = newPosition;
-		RepositionActiveTetromino();
-		return;
-	}
+	m_activePosition = newPosition;
+	RepositionActiveTetromino();
+}
+
+void ABoard::ResetActivePosition()
+{
+	SetActivePosition(FIntPoint(0, (s_gridCols / 2) - 1));
 }
 
 bool ABoard::TryMoveTetromino(const FIntPoint& offset)
@@ -284,19 +284,13 @@ void ABoard::RepositionActiveTetromino()
 
 void ABoard::SpawnNewTetromino()
 {
-	{
-		m_nextTetromino->CopyConfigTo(m_activeTetromino);
-		m_activePosition.X = 0;
-		m_activePosition.Y = (s_gridCols / 2) - 1;
+	m_nextTetromino->CopyConfigTo(m_activeTetromino);
+	
+	ResetActivePosition();
 
-		RepositionActiveTetromino();
-	}
-
-	{
-		m_nextTetromino->Randomize();
-		m_nextTetromino->SetTheme(GetRandomBlockTheme());
-		m_nextTetromino->SetType(GetRandomTetrominoType());
-	}
+	m_nextTetromino->Randomize();
+	m_nextTetromino->SetTheme(GetRandomBlockTheme());
+	m_nextTetromino->SetType(GetRandomTetrominoType());
 
 	m_canHold = true;
 }
@@ -375,7 +369,7 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 			OnClearLines123().Broadcast(numLines);
 
 		m_gameMode->OnClearLines(GetOwnerPawn(), numLines);
-		ResetDropTimer();
+		ResetDescendTimer();
 	}
 }
 
@@ -441,14 +435,14 @@ void ABoard::UpdateGhost()
 	}
 }
 
-void ABoard::ResetDropTimer()
+void ABoard::ResetDescendTimer()
 {
 	auto& timeMgr = GetWorldTimerManager();
-	const bool wasPaused = timeMgr.IsTimerPaused(m_dropTimerHandle);
-	timeMgr.ClearTimer(m_dropTimerHandle);
-	timeMgr.SetTimer(m_dropTimerHandle, this, &ABoard::OnDescendTimer, m_gameMode->GetTetrominoDropTime(), true, 0.0f);
+	const bool wasPaused = timeMgr.IsTimerPaused(m_descendTimerHandle);
+	timeMgr.ClearTimer(m_descendTimerHandle);
+	timeMgr.SetTimer(m_descendTimerHandle, this, &ABoard::OnDescendTimer, m_gameMode->GetTetrominoDropTime(), true, 0.0f);
 	if (wasPaused)
-		timeMgr.PauseTimer(m_dropTimerHandle);
+		timeMgr.PauseTimer(m_descendTimerHandle);
 }
 
 ETetrominoType ABoard::GetRandomTetrominoType()

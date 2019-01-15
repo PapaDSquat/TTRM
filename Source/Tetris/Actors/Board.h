@@ -70,6 +70,7 @@ private:
 	void OnDescendTimer();
 
 	void SetActivePosition(const FIntPoint& newPosition);
+	void ResetActivePosition();
 	void RepositionActiveTetromino();
 	void SpawnNewTetromino();
 
@@ -86,7 +87,7 @@ private:
 
 	void UpdateGhost();
 
-	void ResetDropTimer();
+	void ResetDescendTimer();
 
 	ETetrominoType GetRandomTetrominoType();
 	const FBlockTheme& GetRandomBlockTheme();
@@ -106,7 +107,7 @@ private:
 	FIntPoint m_activePosition;
 	FIntPoint m_ghostPosition;
 
-	FTimerHandle m_dropTimerHandle;
+	FTimerHandle m_descendTimerHandle;
 
 	ATetrisGameMode* m_gameMode;
 
