@@ -79,7 +79,7 @@ void ABoard::BeginPlay()
 		}
 
 		{
-			const FVector localLocation(-650.f, 0.f, -200.f);
+			const FVector localLocation(-550.f, 0.f, -200.f);
 			m_holdTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 			m_holdTetromino->AttachToActor(this, attachRules);
 

@@ -72,7 +72,7 @@ private:
 	void OnBoardGameOver();
 
 	ATetrisGameMode* m_gameMode;
-	ABoard* m_board;
+	ABoard*	m_board;
 
 	// Input Improvements
 	float m_timeBeforeMoveH{ 0.f };
@@ -83,11 +83,9 @@ private:
 public:
 	FPlayerRoundStats& GetRoundStats() const;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
-	ABoard*	Board;
 
 	UPROPERTY(EditAnywhere, Category = "Tetris Actors")
-	TSubclassOf<ABoard> BoardClass;
+	TSubclassOf<ABoard> BoardClass; // Fallback
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	ABoard* GetBoard() const { return m_board; }
