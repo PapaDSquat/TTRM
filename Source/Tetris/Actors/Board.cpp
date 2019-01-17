@@ -67,6 +67,7 @@ void ABoard::BeginPlay()
 			m_activeTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 			m_activeTetromino->AttachToActor(this, attachRules);
 			m_activeTetromino->Initialize({});
+			m_activeTetromino->SetOwner(this);
 		}
 
 		{
@@ -76,6 +77,7 @@ void ABoard::BeginPlay()
 			const FVector localLocation(1250.f, 0.f, -200.f);
 			m_nextTetromino->SetActorRelativeLocation(localLocation);
 			m_nextTetromino->Initialize({});
+			m_nextTetromino->SetOwner(this);
 		}
 
 		{
@@ -85,12 +87,14 @@ void ABoard::BeginPlay()
 
 			m_holdTetromino->SetActorRelativeLocation(localLocation);
 			m_holdTetromino->Initialize({});
+			m_holdTetromino->SetOwner(this);
 		}
 
 		{
 			m_ghostTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
 			m_ghostTetromino->AttachToActor(this, attachRules);
 			m_ghostTetromino->Initialize(ATetromino::InitializeParams({ true }));
+			m_ghostTetromino->SetOwner(this);
 		}
 	}
 	

@@ -9,8 +9,7 @@
 #include "../TetrisGameInstance.h"
 
 ATetrisGameMode::ATetrisGameMode()
-	: NumPlayers(1)
-	, Lines(0)
+	: Lines(0)
 	, Score(0)
 	, InitialGameSpeed(1.f)
 	, InitialTetrominoDropTime(1.f)
@@ -92,11 +91,6 @@ void ATetrisGameMode::StartGame()
 		audioMgr->StopMusic();
 		audioMgr->PlayMusic();
 
-		if (NumPlayers)
-		{
-
-		}
-
 		FireGameEvent(EGameEventType::Start);
 	}
 }
@@ -154,27 +148,27 @@ bool ATetrisGameMode::IsGamePaused() const
 
 void ATetrisGameMode::SetNumPlayers(int32 num)
 {
-	if (NumPlayers == num)
+	const int32 currentNum = GetNumPlayers();
+	const int32 newNum = FMath::Max(1, num); // Minimum 1 player
+	if (currentNum == newNum)
 		return;
 
-	if (NumPlayers < num )
+	// Spawn new players
+	if (newNum > currentNum)
 	{
-		// Create players
-		for (int32 i = NumPlayers; i < num; ++i)
+		for (int32 i = currentNum; i < newNum; ++i)
 		{
 			UGameplayStatics::CreatePlayer(GetWorld(), i);
 		}
 	}
-	else if(NumPlayers > num)
+	// Remove old players
+	else
 	{
-		// Remove players
-		for (int32 i = NumPlayers -1; i >= num; --i)
+		for (int32 i = currentNum; i > newNum; --i)
 		{
-			UGameplayStatics::RemovePlayer(UGameplayStatics::GetPlayerController(GetWorld(),i),true);
+			UGameplayStatics::RemovePlayer(UGameplayStatics::GetPlayerController(GetWorld(), i-1), true);
 		}
 	}
-
-	NumPlayers = num;
 
 	RestartGame();
 }
