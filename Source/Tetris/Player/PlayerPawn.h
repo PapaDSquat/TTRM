@@ -62,6 +62,7 @@ private:
 	void RotateCCW();
 	void Drop();
 	void Hold();
+	void ReleaseHorizontal();
 	bool CanAxisMove(EMoveDirection direction) const;
 
 	// Event Callbacks
@@ -83,7 +84,14 @@ private:
 public:
 	FPlayerRoundStats& GetRoundStats() const;
 
+	// Time between moving the tetromino while holding a direction
+	UPROPERTY(EditAnywhere, Category = "Tetris")
+	float TimeBetweenHoldMoves;
 
+	// Time after the first move in a direction before we allow full hold action
+	UPROPERTY(EditAnywhere, Category = "Tetris")
+	float TimeAfterFirstHoldMove;
+	 
 	UPROPERTY(EditAnywhere, Category = "Tetris Actors")
 	TSubclassOf<ABoard> BoardClass; // Fallback
 

@@ -9,12 +9,9 @@
 #include "../Theme/TetrisTheme.h"
 #include "../TetrisGameInstance.h"
 
-namespace
-{
-	static float s_timeBetweenHoldMoves = 0.1f;
-}
-
 APlayerPawn::APlayerPawn()
+	: TimeBetweenHoldMoves( 0.1f )
+	, TimeAfterFirstHoldMove( 0.25f )
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -56,6 +53,10 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("RotateCCW", IE_Pressed, this, &APlayerPawn::RotateCCW);
 	PlayerInputComponent->BindAction("Drop", IE_Pressed, this, &APlayerPawn::Drop);
 	PlayerInputComponent->BindAction("Hold", IE_Pressed, this, &APlayerPawn::Hold);
+
+	PlayerInputComponent->BindAction("MoveLeft", IE_Released, this, &APlayerPawn::ReleaseHorizontal);
+	PlayerInputComponent->BindAction("MoveRight", IE_Released, this, &APlayerPawn::ReleaseHorizontal);
+	PlayerInputComponent->BindAction("MoveAxisHorizontal", IE_Released, this, &APlayerPawn::ReleaseHorizontal);
 }
 
 void APlayerPawn::SetupBoard()
@@ -102,21 +103,21 @@ void APlayerPawn::MoveLeft()
 {
 	if (!IsGameActive()) return;
 	if (m_board) m_board->MoveLeft();
-	m_timeBeforeMoveH = s_timeBetweenHoldMoves;
+	m_timeBeforeMoveH = m_lastMoveDirection == EMoveDirection::MAX ? TimeAfterFirstHoldMove : TimeBetweenHoldMoves;
 	m_lastMoveDirection = EMoveDirection::Left;
 }
 void APlayerPawn::MoveRight()
 {
 	if (!IsGameActive()) return;
 	if (m_board) m_board->MoveRight();
-	m_timeBeforeMoveH = s_timeBetweenHoldMoves;
+	m_timeBeforeMoveH = m_lastMoveDirection == EMoveDirection::MAX ? TimeAfterFirstHoldMove : TimeBetweenHoldMoves;
 	m_lastMoveDirection = EMoveDirection::Right;
 }
 void APlayerPawn::MoveDown()
 {
 	if (!IsGameActive()) return;
 	if (m_board) m_board->MoveDown();
-	m_timeBeforeMoveV = s_timeBetweenHoldMoves;
+	m_timeBeforeMoveV = TimeBetweenHoldMoves;
 	m_lastMoveDirection = EMoveDirection::Down;
 }
 
@@ -138,6 +139,7 @@ void APlayerPawn::MoveAxisHorizontal(float value)
 	if (value < 0.f) MoveLeftHold();
 	else if (value > 0.f) MoveRightHold();
 }
+
 void APlayerPawn::MoveAxisVertical(float value)
 {
 	if (value == 0.f)
@@ -171,6 +173,12 @@ void APlayerPawn::Hold()
 {
 	if (!IsGameActive()) return;
 	if (m_board) m_board->Hold();
+}
+
+void APlayerPawn::ReleaseHorizontal()
+{
+	m_lastMoveDirection = EMoveDirection::MAX;
+	m_timeBeforeMoveH = 0.f;
 }
 
 bool APlayerPawn::CanAxisMove(EMoveDirection direction) const
