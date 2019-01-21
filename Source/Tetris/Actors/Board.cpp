@@ -363,14 +363,14 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 		}
 	}
 
-	OnPlaceTetromino().Broadcast();
+	OnPlaceTetromino().Broadcast(this, numLines);
 
 	if (numLines > 0)
 	{
 		if (numLines == 4)
-			OnClearTetris().Broadcast();
+			OnClearTetris().Broadcast(this);
 		else
-			OnClearLines123().Broadcast(numLines);
+			OnClearLines123().Broadcast(this, numLines);
 
 		m_gameMode->OnClearLines(GetOwnerPawn(), numLines);
 		ResetDescendTimer();
@@ -385,6 +385,62 @@ void ABoard::PlaceBlocks(const FIntPoint& position)
 		localPos += position;
 	}
 	PlaceBlocks(localGridPositions);
+}
+
+void ABoard::SendLines(int32 numLines)
+{
+	if (numLines <= 0)
+		return;
+
+	// First move everything up
+	for (int32 row = 0; row < s_gridRows; ++row)
+	{
+		const int32 copyTopRow = row + numLines;
+		//const int32 copyBotRow = row + numLines + numLines - 1;
+		for (int32 col = 0; col < s_gridCols; ++col)
+		{
+			if (copyTopRow >= s_gridRows)
+			{
+				SetTileFilled(row, col, false);
+				//m_grid[row][col].filled = 0;
+			}
+			else 
+			{
+				CopyTile(m_grid[copyTopRow][col], m_grid[row][col]);
+				//m_grid[row][col].filled = m_grid[copyTopRow][col].filled;
+			}
+		}
+	}
+
+
+	// Check if active piece collides with anything -> Position it?
+
+	// TODO: Check if above the top -> game over
+
+	// Then fill in the empty lines at the bottom
+	{
+		const int32 topRow = s_gridRows - numLines;
+		const int32 botRow = s_gridRows - 1;
+		for (int32 row = topRow; row <= botRow; ++row)
+		{
+			const int32 ignoreBlockCol = FMath::RandRange(0, s_gridCols - 1);
+
+			for (int32 col = 0; col < s_gridCols; ++col)
+			{
+				if (col == ignoreBlockCol)
+				{
+					SetTileFilled(row, col, false);
+					//m_grid[row][col].filled = 0;
+				}
+				else 
+				{
+					SetTileFilled(row, col, true);
+					
+					//m_grid[row][col].filled = 1;
+				}
+			}
+		}
+	}
 }
 
 void ABoard::CopyTile(const TileData& source, TileData& dest) const

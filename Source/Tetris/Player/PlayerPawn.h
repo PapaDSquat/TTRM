@@ -67,10 +67,10 @@ private:
 
 	// Event Callbacks
 	void OnGameEvent(EGameEventType eventType);
-	void OnBoardPlaceTetromino();
-	void OnBoardClearLines123(int8 numLines);
-	void OnBoardClearTetris();
-	void OnBoardGameOver();
+	void OnBoardPlaceTetromino(ABoard* board, int8 numLines);
+	void OnBoardClearLines123(ABoard* board, int8 numLines);
+	void OnBoardClearTetris(ABoard* board);
+	void OnBoardGameOver(ABoard* board);
 
 	ATetrisGameMode* m_gameMode;
 	ABoard*	m_board;

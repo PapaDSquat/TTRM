@@ -15,7 +15,7 @@ class ATetrisGameMode;
 enum class ETetrominoType : int8;
 class APlayerPawn;
 
-UCLASS()
+UCLASS(BlueprintType)
 class TETRIS_API ABoard : public AActor
 {
 	GENERATED_BODY()
@@ -35,6 +35,9 @@ public:
 	void ResetBoard();
 	void StopGame();
 
+	APlayerPawn* GetOwnerPawn();
+	void SendLines(int32 numLines);
+
 	// Input Interface
 	void SetPaused(bool paused);
 	void MoveLeft();
@@ -46,16 +49,16 @@ public:
 	void Hold();
 
 	// Events
-	DECLARE_EVENT(ABoard, FPlaceTetrominoEvent)
+	DECLARE_EVENT_TwoParams(ABoard, FPlaceTetrominoEvent, ABoard* /*board*/, int8 /*numLines*/)
 	FPlaceTetrominoEvent& OnPlaceTetromino() { return m_evtPlaceTetromino; }
 
-	DECLARE_EVENT_OneParam(ABoard, FClearLines123Event, int8 /*numLines*/)
+	DECLARE_EVENT_TwoParams(ABoard, FClearLines123Event, ABoard* /*board*/, int8 /*numLines*/)
 	FClearLines123Event& OnClearLines123() { return m_evtClearLines123; }
 
-	DECLARE_EVENT(ABoard, FClearTetrisEvent)
+	DECLARE_EVENT_OneParam(ABoard, FClearTetrisEvent, ABoard* /*board*/ )
 	FClearTetrisEvent& OnClearTetris() { return m_evtClearTetris; }
 
-	DECLARE_EVENT(ABoard, FGameOverEvent)
+	DECLARE_EVENT_OneParam(ABoard, FGameOverEvent, ABoard* /*board*/ )
 	FGameOverEvent& OnGameOver() { return m_evtGameOver; }
 
 private:
@@ -64,8 +67,6 @@ private:
 		bool filled;
 		ABlock* block;
 	};
-
-	APlayerPawn* GetOwnerPawn();
 
 	void OnDescendTimer();
 

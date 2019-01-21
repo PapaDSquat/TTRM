@@ -227,22 +227,22 @@ void APlayerPawn::OnGameEvent(EGameEventType eventType)
 	}
 }
 
-void APlayerPawn::OnBoardPlaceTetromino()
+void APlayerPawn::OnBoardPlaceTetromino( ABoard* board, int8 numLines )
 {
 	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().DropPieceSound);
 }
 
-void APlayerPawn::OnBoardClearLines123( int8 numLines )
+void APlayerPawn::OnBoardClearLines123( ABoard* board, int8 numLines )
 {
 	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().ClearLinesSound);
 }
 
-void APlayerPawn::OnBoardClearTetris()
+void APlayerPawn::OnBoardClearTetris(ABoard* board)
 {
 	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().TetrisSound);
 }
 
-void APlayerPawn::OnBoardGameOver()
+void APlayerPawn::OnBoardGameOver(ABoard* board)
 {
 	GetTetrisGameInstance()->GetAudioManager()->PlaySound(m_gameMode->GetCurrentTheme().GameOverSound);
 }

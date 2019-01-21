@@ -51,12 +51,22 @@ protected:
 	UTetrisGameInstance* GetTetrisGameInstance();
 	void FireGameEvent( EGameEventType eventType );
 
+	// Override for custom game modes
+	virtual void OnStartGameInternal() {}
+	virtual void OnEndGameInternal() {}
+	virtual void OnGameOverInternal() {}
+	virtual void OnRestartGameInternal() {}
+	virtual void OnPauseGameInternal() {}
+	virtual void OnUnpauseGameInternal() {}
+
 	bool m_gameStarted;
 	bool m_gamePaused;
 	float m_startTime;
 	float m_currentTime;
 
 	FTetrisTheme m_currentTheme;
+
+	TArray< APlayerPawn* > m_players; // Is this safe?
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Tetris")

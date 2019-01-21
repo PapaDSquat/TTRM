@@ -29,19 +29,13 @@ public:
 	virtual float GetGameSpeed(APlayerPawn* playerPawn) const override;
 	virtual float GetTetrominoDropTime(APlayerPawn* playerPawn) const override;
 
-public:
-	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
-	int32 Level;
-
-	UFUNCTION(BlueprintCallable, Category = "Tetris")
-	int32 GetLevel() const { return Level; }
-	
+public:	
 	//== EVENTS
 	// TODO: Change to a struct of score data
 	DECLARE_EVENT_TwoParams(ABoard, FScoreEvent, int32, int32)
 	FScoreEvent& OnScoreEvent() { return m_scoreEvent; }
 
+
 private:
 	FScoreEvent m_scoreEvent;
-
 };

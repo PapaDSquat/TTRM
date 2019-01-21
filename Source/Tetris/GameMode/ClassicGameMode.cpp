@@ -10,7 +10,6 @@
 static const int32 s_linesPerLevel = 10;
 
 AClassicGameMode::AClassicGameMode()
-	: Level( 0 )
 {
 
 }
@@ -23,7 +22,6 @@ void AClassicGameMode::InitGame(const FString& MapName, const FString& Options, 
 void AClassicGameMode::InitGameState()
 {
 	Super::InitGameState();
-	
 }
 
 bool AClassicGameMode::OnClearLines(APlayerPawn* playerPawn, uint8 numLines)

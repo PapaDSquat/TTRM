@@ -6,6 +6,7 @@
 #include "../Theme/TetrisTheme.h"
 #include "../Audio/TetrisAudioManager.h"
 #include "../Player/TetrisPlayerState.h"
+#include "../Player/PlayerPawn.h"
 #include "../TetrisGameInstance.h"
 
 ATetrisGameMode::ATetrisGameMode()
@@ -21,7 +22,6 @@ ATetrisGameMode::ATetrisGameMode()
 
 	PlayerStateClass = ATetrisPlayerState::StaticClass();
 
-	
 }
 
 void ATetrisGameMode::BeginPlay()
@@ -79,6 +79,15 @@ void ATetrisGameMode::StartGame()
 	{
 		m_gameStarted = true;
 
+		m_players.Empty();
+		for (auto it = GetWorld()->GetPawnIterator(); it; ++it)
+		{
+			if (APlayerPawn* playerPawn = Cast< APlayerPawn >(it->Get()))
+			{
+				m_players.Push(playerPawn);
+			}
+		}
+
 		m_startTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 
 		if (Themes && 
@@ -93,6 +102,7 @@ void ATetrisGameMode::StartGame()
 
 		FireGameEvent(EGameEventType::Start);
 	}
+	OnStartGameInternal();
 }
 
 void ATetrisGameMode::EndGame()
@@ -102,6 +112,9 @@ void ATetrisGameMode::EndGame()
 		m_gameStarted = false;
 		GetTetrisGameInstance()->GetAudioManager()->StopMusic();
 		FireGameEvent(EGameEventType::End);
+		OnEndGameInternal();
+
+		m_players.Empty();
 	}
 }
 
@@ -109,6 +122,7 @@ void ATetrisGameMode::GameOver()
 {
 	EndGame();
 	FireGameEvent(EGameEventType::GameOver);
+	OnGameOverInternal();
 }
 
 void ATetrisGameMode::RestartGame()
@@ -116,6 +130,7 @@ void ATetrisGameMode::RestartGame()
 	EndGame();
 	StartGame();
 	FireGameEvent(EGameEventType::Restart);
+	OnRestartGameInternal();
 }
 
 void ATetrisGameMode::PauseGame()
@@ -124,7 +139,9 @@ void ATetrisGameMode::PauseGame()
 	{
 		m_gamePaused = true;
 		FireGameEvent(EGameEventType::Pause);
+		OnPauseGameInternal();
 	}
+
 }
 
 void ATetrisGameMode::UnpauseGame()
@@ -133,6 +150,7 @@ void ATetrisGameMode::UnpauseGame()
 	{
 		m_gamePaused = false;
 		FireGameEvent(EGameEventType::Unpause);
+		OnUnpauseGameInternal();
 	}
 }
 
