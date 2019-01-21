@@ -15,6 +15,16 @@ class ATetrisGameMode;
 enum class ETetrominoType : int8;
 class APlayerPawn;
 
+USTRUCT(BlueprintType, Category = "Tetris Debug")
+struct FDebugTableRow
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Tetris")
+	TArray<bool> Cols;
+};
+using FDebugTable = TArray< FDebugTableRow >;
+
 UCLASS(BlueprintType)
 class TETRIS_API ABoard : public AActor
 {
@@ -47,6 +57,10 @@ public:
 	void RotateCCW();
 	void Drop();
 	void Hold();
+
+	// Helpers
+	static uint8 GetTotalRows() { return s_gridRows; }
+	static uint8 GetTotalColumns() { return s_gridCols; }
 
 	// Events
 	DECLARE_EVENT_TwoParams(ABoard, FPlaceTetrominoEvent, ABoard* /*board*/, int8 /*numLines*/)
@@ -85,6 +99,7 @@ private:
 	void SetTileFilled(uint8 row, uint8 col, bool filled);
 
 	FBox2D GetActiveBounds() const;
+	bool GetBlockDefaultFill(uint8 row, uint8 col) const;
 
 	void UpdateGhost();
 
@@ -126,4 +141,13 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Tetris Setup")
 	TSubclassOf<ABlock> BlockClass;
+
+	// Debug
+	UPROPERTY(EditAnywhere, Category = "Tetris Debug")
+	bool DEBUG_DefaultBoardEnabled;
+
+	//using DebugRow = TArray<bool, TFixedAllocator<s_gridRows>>;
+	//using DebugTable = TArray< DebugRow, TFixedAllocator<s_gridCols>>;
+	UPROPERTY(EditAnywhere, Category = "Tetris Debug")
+	TArray< FDebugTableRow > DEBUG_DefaultBoard;
 };

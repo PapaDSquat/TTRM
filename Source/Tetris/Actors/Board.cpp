@@ -11,9 +11,25 @@
 const uint8 ABoard::s_gridRows;
 const uint8 ABoard::s_gridCols;
 
+namespace
+{
+	FDebugTable DebugInitDefaultBoard()
+	{
+		FDebugTable table;
+		for (uint8 r = 0; r < ABoard::GetTotalRows(); ++r)
+		{
+			FDebugTableRow& tableRow = table.Emplace_GetRef();
+			tableRow.Cols.AddZeroed(ABoard::GetTotalColumns());
+		}
+		return table;
+	}
+}
+
 // Sets default values
 ABoard::ABoard()
 : m_canHold( true )
+, DEBUG_DefaultBoardEnabled(false)
+, DEBUG_DefaultBoard(DebugInitDefaultBoard())
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -51,9 +67,12 @@ void ABoard::BeginPlay()
 
 			block->SetActorHiddenInGame(true);
 
+			
 			m_grid[r][c] = { 0, block };
 		}
 	}
+
+
 
 	{
 		// Spawn Tetrominos
@@ -114,8 +133,9 @@ void ABoard::ResetBoard()
 		for (uint8 c = 0; c < s_gridCols; ++c)
 		{
 			TileData& tile = m_grid[r][c];
-			tile.filled = false;
-			tile.block->SetActorHiddenInGame(true);
+			const bool filled = GetBlockDefaultFill(r, c);
+			tile.filled = filled;
+			tile.block->SetActorHiddenInGame(!filled);
 		}
 	}
 	
@@ -133,6 +153,22 @@ void ABoard::ResetBoard()
 
 	SpawnNewTetromino();
 	ResetDescendTimer();
+}
+
+bool ABoard::GetBlockDefaultFill(uint8 row, uint8 col) const
+{
+	if (DEBUG_DefaultBoardEnabled)
+	{
+		if (DEBUG_DefaultBoard.Num() > row)
+		{
+			const FDebugTableRow& tableRow = DEBUG_DefaultBoard[row];
+			if (tableRow.Cols.Num() > col)
+			{
+				return tableRow.Cols[col];
+			}
+		}
+	}
+	return false;
 }
 
 void ABoard::SetPaused(bool paused)
