@@ -85,6 +85,8 @@ void ATetrisGameMode::StartGame()
 			if (APlayerPawn* playerPawn = Cast< APlayerPawn >(it->Get()))
 			{
 				m_players.Push(playerPawn);
+
+				playerPawn->GetRoundStats().Reset();
 			}
 		}
 

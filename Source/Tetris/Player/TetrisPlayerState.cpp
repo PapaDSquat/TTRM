@@ -11,3 +11,8 @@ FPlayerRoundStats& ATetrisPlayerState::GetRoundStats()
 {
 	return m_roundStats;
 }
+
+void FPlayerRoundStats::Reset()
+{
+	Score = Lines = Level = 0;
+}

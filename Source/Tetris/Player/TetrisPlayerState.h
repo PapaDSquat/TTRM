@@ -15,7 +15,7 @@ public:
 	FPlayerRoundStats()
 	{}
 
-	// static const FScoreData& DEFAULT();
+	void Reset();
 
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
 	int32 Score;
