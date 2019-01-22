@@ -96,7 +96,9 @@ private:
 	void PlaceBlocks(const FIntPoint& position);
 
 	void CopyTile(const TileData& source, TileData& dest) const;
-	void SetTileFilled(uint8 row, uint8 col, bool filled);
+	void SetBlockFilled(uint8 row, uint8 col, bool filled);
+	void SetBlockAsGarbage(uint8 row, uint8 col);
+	static bool IsValidGridPosition(uint8 row, uint8 col);
 
 	FBox2D GetActiveBounds() const;
 	bool GetBlockDefaultFill(uint8 row, uint8 col) const;

@@ -136,6 +136,7 @@ void ABoard::ResetBoard()
 			const bool filled = GetBlockDefaultFill(r, c);
 			tile.filled = filled;
 			tile.block->SetActorHiddenInGame(!filled);
+			if (filled) SetBlockAsGarbage(r, c);
 		}
 	}
 	
@@ -346,7 +347,7 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 
 		TileData& tileData = m_grid[pos.X][pos.Y];
 
-		SetTileFilled(pos.X, pos.Y, true);
+		SetBlockFilled(pos.X, pos.Y, true);
 
 		minRow = FMath::Min(minRow, pos.X);
 		maxRow = FMath::Max(maxRow, pos.X);
@@ -387,7 +388,7 @@ void ABoard::PlaceBlocks(const TArray< FIntPoint >& positions)
 					TileData& currentTile = m_grid[boardRow][col];
 					if (boardRow == 0)
 					{
-						SetTileFilled(boardRow, col, false);
+						SetBlockFilled(boardRow, col, false);
 						continue;
 					}
 
@@ -429,21 +430,20 @@ void ABoard::SendLines(int32 numLines)
 		return;
 
 	// First move everything up
-	for (int32 row = 0; row < s_gridRows; ++row)
+	for (int32 r = 0; r < s_gridRows; ++r)
 	{
-		const int32 copyTopRow = row + numLines;
-		//const int32 copyBotRow = row + numLines + numLines - 1;
-		for (int32 col = 0; col < s_gridCols; ++col)
+		const int32 copyTopRow = r + numLines;
+		for (int32 c = 0; c < s_gridCols; ++c)
 		{
 			if (copyTopRow >= s_gridRows)
 			{
-				SetTileFilled(row, col, false);
-				//m_grid[row][col].filled = 0;
+				// Below the bounds, so clear
+				SetBlockFilled(r, c, false);
 			}
 			else 
 			{
-				CopyTile(m_grid[copyTopRow][col], m_grid[row][col]);
-				//m_grid[row][col].filled = m_grid[copyTopRow][col].filled;
+				// Otherwise, copy!
+				CopyTile(m_grid[copyTopRow][c], m_grid[r][c]);
 			}
 		}
 	}
@@ -457,22 +457,20 @@ void ABoard::SendLines(int32 numLines)
 	{
 		const int32 topRow = s_gridRows - numLines;
 		const int32 botRow = s_gridRows - 1;
-		for (int32 row = topRow; row <= botRow; ++row)
+		for (int32 r = topRow; r <= botRow; ++r)
 		{
 			const int32 ignoreBlockCol = FMath::RandRange(0, s_gridCols - 1);
 
-			for (int32 col = 0; col < s_gridCols; ++col)
+			for (int32 c = 0; c < s_gridCols; ++c)
 			{
-				if (col == ignoreBlockCol)
+				if (c == ignoreBlockCol)
 				{
-					SetTileFilled(row, col, false);
-					//m_grid[row][col].filled = 0;
+					SetBlockFilled(r, c, false);
 				}
 				else 
 				{
-					SetTileFilled(row, col, true);
-					
-					//m_grid[row][col].filled = 1;
+					SetBlockFilled(r, c, true);
+					SetBlockAsGarbage(r, c);
 				}
 			}
 		}
@@ -486,12 +484,25 @@ void ABoard::CopyTile(const TileData& source, TileData& dest) const
 	dest.block->SetTheme(source.block->GetTheme());
 }
 
-void ABoard::SetTileFilled(uint8 row, uint8 col, bool filled)
+void ABoard::SetBlockFilled(uint8 row, uint8 col, bool filled)
 {
-	TileData& currentTile = m_grid[row][col];
-	currentTile.filled = filled;
-	currentTile.block->SetActorHiddenInGame(!filled);
-	currentTile.block->SetTheme(m_activeTetromino->GetTheme());
+	check(IsValidGridPosition(row, col));
+	TileData& tile = m_grid[row][col];
+	tile.filled = filled;
+	tile.block->SetActorHiddenInGame(!filled);
+	tile.block->SetTheme(m_activeTetromino->GetTheme());
+}
+
+void ABoard::SetBlockAsGarbage(uint8 row, uint8 col)
+{
+	check(IsValidGridPosition(row, col));
+	TileData& tile = m_grid[row][col];
+	tile.block->SetTheme(m_gameMode->GetCurrentTheme().GarbagePieceTheme);
+}
+
+bool ABoard::IsValidGridPosition(uint8 row, uint8 col)
+{
+	return row < s_gridRows && col < s_gridCols;
 }
 
 FBox2D ABoard::GetActiveBounds() const
