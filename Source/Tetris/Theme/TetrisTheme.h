@@ -88,7 +88,10 @@ struct TETRIS_API FTetrisTheme
 	FThemeMaterialParams GhostPieceTheme;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FThemeMaterialParams GameOverPieceTheme;
+	FBlockTheme GameOverPieceTheme;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FBlockTheme GarbagePieceTheme;
 
 	/*
 	Audio

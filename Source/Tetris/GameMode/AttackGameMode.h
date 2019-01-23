@@ -22,7 +22,7 @@ public:
 	virtual bool OnClearLines(APlayerPawn* playerPawn, uint8 numLines) override;
 
 	// Board Callbacks
-	void OnBoardPlaceTetromino(ABoard* board, int8 numLines);
+	void OnBoardPlaceTetromino(ABoard* sourceBoard, int8 numLinesCleared);
 
 private:
 	void QueueAttack(APlayerPawn* source, APlayerPawn* target, int32 linesToSend);
