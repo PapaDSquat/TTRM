@@ -64,57 +64,81 @@ void ABoard::BeginPlay()
 
 			const FVector location(c * 100.f, 0.f, -r * 100.f);
 			block->SetActorRelativeLocation(location);
-
 			block->SetActorHiddenInGame(true);
 
-			
 			m_grid[r][c] = { 0, block };
 		}
 	}
 
+	// Load attached actors
+	TArray<UActorComponent*> comps = (GetComponentsByClass(UChildActorComponent::StaticClass()));
+	{
+		for (UActorComponent* comp : comps)
+		{
+			if (UChildActorComponent* childComp = Cast<UChildActorComponent>(comp))
+			{
+				if (ATetromino* tetromino = Cast<ATetromino>(childComp->GetChildActor()))
+				{
+					if (comp->GetName() == "HoldTetromino")
+					{
+						m_holdTetromino = tetromino;
+					}
+					else if (comp->GetName() == "NextTetromino")
+					{
+						m_nextTetromino = tetromino;
+					}
+				}
+			}
+		}
+	}
 
+	FVector location(0.0f, 0.0f, 0.0f);
+	FRotator rotation(0.0f, 0.0f, 0.0f);
+	FAttachmentTransformRules attachRules(EAttachmentRule::KeepRelative, false);
+	FActorSpawnParameters spawnInfo;
+	spawnInfo.Owner = this;
+
+	/*
+		Fail-safe spawn for Static tetrominos
+	*/
+	if (m_nextTetromino == nullptr)
+	{
+		m_nextTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+		m_nextTetromino->AttachToActor(this, attachRules);
+
+		const FVector localLocation(1250.f, 0.f, -200.f);
+		m_nextTetromino->SetActorRelativeLocation(localLocation);
+		m_nextTetromino->Initialize({});
+		m_nextTetromino->SetOwner(this);
+	}
+
+	if (m_holdTetromino == nullptr)
+	{
+		const FVector localLocation(-550.f, 0.f, -200.f);
+		m_holdTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+		m_holdTetromino->AttachToActor(this, attachRules);
+
+		m_holdTetromino->SetActorRelativeLocation(localLocation);
+		m_holdTetromino->Initialize({});
+		m_holdTetromino->SetOwner(this);
+	}
+
+	/*
+		Spawn dynamic Tetrominos
+	*/
 
 	{
-		// Spawn Tetrominos
-		FVector location(0.0f, 0.0f, 0.0f);
-		FRotator rotation(0.0f, 0.0f, 0.0f);
-		FAttachmentTransformRules attachRules(EAttachmentRule::KeepRelative, false);
-		FActorSpawnParameters spawnInfo;
-		spawnInfo.Owner = this;
+		m_activeTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+		m_activeTetromino->AttachToActor(this, attachRules);
+		m_activeTetromino->Initialize({});
+		m_activeTetromino->SetOwner(this);
+	}
 
-		{
-			m_activeTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
-			m_activeTetromino->AttachToActor(this, attachRules);
-			m_activeTetromino->Initialize({});
-			m_activeTetromino->SetOwner(this);
-		}
-
-		{
-			m_nextTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
-			m_nextTetromino->AttachToActor(this, attachRules);
-
-			const FVector localLocation(1250.f, 0.f, -200.f);
-			m_nextTetromino->SetActorRelativeLocation(localLocation);
-			m_nextTetromino->Initialize({});
-			m_nextTetromino->SetOwner(this);
-		}
-
-		{
-			const FVector localLocation(-550.f, 0.f, -200.f);
-			m_holdTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
-			m_holdTetromino->AttachToActor(this, attachRules);
-
-			m_holdTetromino->SetActorRelativeLocation(localLocation);
-			m_holdTetromino->Initialize({});
-			m_holdTetromino->SetOwner(this);
-		}
-
-		{
-			m_ghostTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
-			m_ghostTetromino->AttachToActor(this, attachRules);
-			m_ghostTetromino->Initialize(ATetromino::InitializeParams({ true }));
-			m_ghostTetromino->SetOwner(this);
-		}
+	{
+		m_ghostTetromino = GetWorld()->SpawnActor< ATetromino >(TetrominoClass, location, rotation, spawnInfo);
+		m_ghostTetromino->AttachToActor(this, attachRules);
+		m_ghostTetromino->Initialize(ATetromino::InitializeParams({ true }));
+		m_ghostTetromino->SetOwner(this);
 	}
 	
 	ResetBoard();
