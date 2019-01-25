@@ -43,11 +43,15 @@ void AAttackGameMode::OnBoardPlaceTetromino(ABoard* sourceBoard, int8 numLinesCl
 	{
 		if(hasQueuedLines)
 		{
-			sourceBoard->SendLines(sourceRound.QueuedLines);
+			const int32 linesToSend = sourceRound.QueuedLines;
+			sourceBoard->SendLines(linesToSend);
 
 			// TODO: Score to attacking player
 			sourceRound.QueuedLines = 0;
 			sourceRound.AttackingPlayer = nullptr;
+
+			OnQueueChanged.Broadcast(sourceRound.QueuedLines, sourcePawn);
+			OnAttackFired.Broadcast(linesToSend, attackingPawn, sourcePawn);
 		}
 	}
 	else
@@ -71,6 +75,8 @@ void AAttackGameMode::OnBoardPlaceTetromino(ABoard* sourceBoard, int8 numLinesCl
 			{
 				const int32 newQueue = sourceRound.QueuedLines - linesToSend;
 				sourceRound.QueuedLines = FMath::Max(0, newQueue);
+				OnQueueChanged.Broadcast(sourceRound.QueuedLines, sourcePawn);
+
 				if (newQueue < 0)
 				{
 					// Send attack back to attacker
@@ -100,6 +106,9 @@ void AAttackGameMode::QueueAttack(APlayerPawn* source, APlayerPawn* target, int3
 	FRoundData& targetRound = GetRoundData(target);
 	targetRound.AttackingPlayer = source;
 	targetRound.QueuedLines = linesToSend;
+
+	OnQueueChanged.Broadcast(targetRound.QueuedLines, target);
+	OnAttackQueued.Broadcast(linesToSend, source, target);
 }
 
 AAttackGameMode::FRoundData& AAttackGameMode::GetRoundData(ABoard* board) const

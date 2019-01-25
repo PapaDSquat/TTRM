@@ -93,18 +93,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	bool IsGamePaused() const;
 
-	UPROPERTY(EditAnywhere, Category = "Tetris")
-	int32 InitialGameSpeed;
-
-	UPROPERTY(EditAnywhere, Category = "Tetris")
-	int32 InitialTetrominoDropTime;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
-	int32 NumPlayers;
-
-	UFUNCTION(BlueprintCallable, Category = "Tetris")
-	void SetNumPlayers( int32 num );
-
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	const FTetrisTheme& GetCurrentTheme() const;
 
@@ -121,6 +109,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
 	FName DefaultThemeID;
+
+	UPROPERTY(EditAnywhere, Category = "Tetris")
+	int32 InitialGameSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Tetris")
+	int32 InitialTetrominoDropTime;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
+	int32 NumPlayers;
+	UFUNCTION(BlueprintCallable, Category = "Tetris")
+	void SetNumPlayers(int32 num);
 
 	// TODO: Multiple Players. Group stats into each.
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
@@ -164,10 +163,6 @@ public:
 
 private:
 	FGameEvent m_evtGameEvent;
-	FGameStartEvent m_evtGameStart;
-	FGameRestartEvent m_evtGameRestart;
-	FGameEndEvent m_evtGameEnd;
-	FGamePauseEvent m_evtGamePause;
 
 };
 

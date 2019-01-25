@@ -6,11 +6,12 @@
 #include "ClassicGameMode.h"
 #include "AttackGameMode.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttackQueuedEvent, int, NumLines, APlayerPawn*, Attacker, APlayerPawn*, Receiver);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttackFiredEvent, int, NumLines, APlayerPawn*, Attacker, APlayerPawn*, Receiver);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FQueueChangedEvent, int, NewQueueSize, APlayerPawn*, Source);
+
 class ABoard;
 
-/**
- * 
- */
 UCLASS()
 class TETRIS_API AAttackGameMode : public AClassicGameMode
 {
@@ -28,13 +29,25 @@ private:
 	void QueueAttack(APlayerPawn* source, APlayerPawn* target, int32 linesToSend);
 	bool TryClearAttack(APlayerPawn* source, int32 linesToClear);
 
-	// TODO: Improve this shit
+	// TODO: Improve this
 	struct FRoundData
 	{
 		int32 QueuedLines{ 0 };
 		APlayerPawn* AttackingPlayer;
 	};
 	mutable TMap< APlayerPawn*, FRoundData > m_roundData;
+
+public:
 	FRoundData& GetRoundData(APlayerPawn* pawn) const;
 	FRoundData& GetRoundData(ABoard* board) const;
+
+	//== EVENTS
+	UPROPERTY(BlueprintAssignable)
+	FAttackQueuedEvent OnAttackQueued;
+	
+	UPROPERTY(BlueprintAssignable)
+	FAttackFiredEvent OnAttackFired;
+
+	UPROPERTY(BlueprintAssignable)
+	FQueueChangedEvent OnQueueChanged;
 };
