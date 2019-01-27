@@ -6,7 +6,6 @@
 
 void AAttackGameMode::OnStartGameInternal()
 {
-	m_roundData.Empty();
 	for (APlayerPawn* player : m_players)
 	{
 		m_roundData.Add(player, FRoundData());
@@ -15,6 +14,18 @@ void AAttackGameMode::OnStartGameInternal()
 			board->OnPlaceTetromino().AddUObject(this, &AAttackGameMode::OnBoardPlaceTetromino);
 		}
 	}
+}
+
+void AAttackGameMode::OnEndGameInternal()
+{
+	for (APlayerPawn* player : m_players)
+	{
+		if (ABoard* board = player->GetBoard())
+		{
+			board->OnPlaceTetromino().Clear();
+		}
+	}
+	m_roundData.Empty();
 }
 
 bool AAttackGameMode::OnClearLines(APlayerPawn* playerPawn, uint8 numLines)
@@ -105,7 +116,7 @@ void AAttackGameMode::QueueAttack(APlayerPawn* source, APlayerPawn* target, int3
 {
 	FRoundData& targetRound = GetRoundData(target);
 	targetRound.AttackingPlayer = source;
-	targetRound.QueuedLines = linesToSend;
+	targetRound.QueuedLines += linesToSend;
 
 	OnQueueChanged.Broadcast(targetRound.QueuedLines, target);
 	OnAttackQueued.Broadcast(linesToSend, source, target);

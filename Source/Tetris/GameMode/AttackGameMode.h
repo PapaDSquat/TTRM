@@ -20,6 +20,7 @@ class TETRIS_API AAttackGameMode : public AClassicGameMode
 public:
 	// ATetrisGameMode
 	virtual void OnStartGameInternal() override;
+	virtual void OnEndGameInternal() override;
 	virtual bool OnClearLines(APlayerPawn* playerPawn, uint8 numLines) override;
 
 	// Board Callbacks

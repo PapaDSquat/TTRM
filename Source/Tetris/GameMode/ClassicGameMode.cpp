@@ -59,6 +59,8 @@ bool AClassicGameMode::OnClearLines(APlayerPawn* playerPawn, uint8 numLines)
 	if (newLevel > stats.Level)
 	{
 		++stats.Level;
+
+		// Move this to Player via event
 		GetTetrisGameInstance()->GetAudioManager()->PlaySound(GetCurrentTheme().LevelUpSound);
 		return true;
 	}
