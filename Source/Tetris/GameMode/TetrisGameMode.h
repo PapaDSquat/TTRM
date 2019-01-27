@@ -44,8 +44,8 @@ public:
 
 	// Returns true if leveled up
 	virtual bool OnClearLines(APlayerPawn* playerPawn, uint8 numLines) { return false; }
-	virtual float GetGameSpeed(APlayerPawn* playerPawn) const;
 	virtual float GetTetrominoDropTime(APlayerPawn* playerPawn) const;
+	int32 GetPlayerLevel(APlayerPawn* playerPawn) const;
 
 protected:
 	UTetrisGameInstance* GetTetrisGameInstance();
@@ -109,12 +109,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetris")
 	FName DefaultThemeID;
-
-	UPROPERTY(EditAnywhere, Category = "Tetris")
-	int32 InitialGameSpeed;
-
-	UPROPERTY(EditAnywhere, Category = "Tetris")
-	int32 InitialTetrominoDropTime;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
 	int32 NumPlayers;

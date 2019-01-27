@@ -26,7 +26,6 @@ public:
 	
 	// ATetrisGameMode
 	virtual bool OnClearLines(APlayerPawn* playerPawn, uint8 numLines) override;
-	virtual float GetGameSpeed(APlayerPawn* playerPawn) const override;
 	virtual float GetTetrominoDropTime(APlayerPawn* playerPawn) const override;
 
 public:	

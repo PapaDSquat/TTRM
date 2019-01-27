@@ -12,8 +12,6 @@
 ATetrisGameMode::ATetrisGameMode()
 	: Lines(0)
 	, Score(0)
-	, InitialGameSpeed(1.f)
-	, InitialTetrominoDropTime(1.f)
 	, m_gameStarted( false )
 	, m_gamePaused( false)
 {
@@ -216,14 +214,14 @@ bool ATetrisGameMode::SetTheme(const FTetrisTheme& theme, bool restart /*= true*
 	return false;
 }
 
-float ATetrisGameMode::GetGameSpeed(APlayerPawn* playerPawn) const
+int32 ATetrisGameMode::GetPlayerLevel(APlayerPawn* playerPawn) const
 {
-	return InitialGameSpeed;
+	return playerPawn ? playerPawn->GetRoundStats().Level : 1;
 }
 
 float ATetrisGameMode::GetTetrominoDropTime(APlayerPawn* playerPawn) const
 {
-	return InitialTetrominoDropTime;
+	return 1.f;
 }
 
 FString ATetrisGameMode::GetRoundTimeString() const

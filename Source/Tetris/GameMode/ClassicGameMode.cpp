@@ -65,16 +65,32 @@ bool AClassicGameMode::OnClearLines(APlayerPawn* playerPawn, uint8 numLines)
 	return false;
 }
 
-float AClassicGameMode::GetGameSpeed(APlayerPawn* playerPawn) const
-{
-	if (!playerPawn) return Super::GetGameSpeed(playerPawn);
-	const FPlayerRoundStats& stats = playerPawn->GetRoundStats();
-	return stats.Level + 1;
-}
-
 float AClassicGameMode::GetTetrominoDropTime(APlayerPawn* playerPawn) const
 {
 	if (!playerPawn) return Super::GetTetrominoDropTime(playerPawn);
-	return InitialTetrominoDropTime / GetGameSpeed(playerPawn);
+
+	// Source: https://gaming.stackexchange.com/a/13129
+	const int32 level = GetPlayerLevel(playerPawn);
+	switch (level)
+	{
+	case 0: return 0.8f;
+	case 1: return 0.72f;
+	case 2: return 0.63f;
+	case 3: return 0.55f;
+	case 4: return 0.47f;
+	case 5: return 0.38f;
+	case 6: return 0.3f;
+	case 7: return 0.22f;
+	case 8: return 0.13f;
+	case 9: return 0.1f;
+	case 10: case 11: case 12: return 0.08f;
+	case 13: case 14: case 15: return 0.07f;
+	case 16: case 17: case 18: return 0.05f;
+	default:
+		if (level >= 19 && level <= 28) return 0.03f;
+		else if (level >= 29) return 0.02f;
+	}
+	check(false && "How the hell did we even get here? What does it all mean?");
+	return Super::GetTetrominoDropTime(playerPawn);
 }
 
