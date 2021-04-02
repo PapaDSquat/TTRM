@@ -249,5 +249,5 @@ void APlayerPawn::OnBoardGameOver(ABoard* board)
 
 FPlayerRoundStats& APlayerPawn::GetRoundStats() const
 {
-	return Cast<ATetrisPlayerState>(PlayerState)->GetRoundStats();
+	return Cast<ATetrisPlayerState>(GetPlayerState())->GetRoundStats();
 }

@@ -8,9 +8,9 @@
 #include "../Settings/TetrisSettings.h"
 
 UTetrisAudioManager::UTetrisAudioManager()
-	: m_musicAudioComponent(nullptr)
+	: m_world( nullptr )
+	, m_musicAudioComponent(nullptr)
 	, m_musicCue(nullptr)
-	, m_world(nullptr)
 {
 }
 

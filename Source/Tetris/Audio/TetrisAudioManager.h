@@ -59,8 +59,8 @@ private:
 
 	UWorld* m_world;
 
-	USoundCue* m_musicCue;
 	UAudioComponent* m_musicAudioComponent;
+	USoundCue* m_musicCue;
 
 	FTetrisAudioSettings m_audioSettings;
 };

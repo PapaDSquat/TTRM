@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TetrisGameMode.h"
+#include "EngineUtils.h"
 #include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Theme/TetrisTheme.h"
@@ -10,10 +11,10 @@
 #include "../TetrisGameInstance.h"
 
 ATetrisGameMode::ATetrisGameMode()
-	: Lines(0)
+	: m_gameStarted( false )
+	, m_gamePaused( false )
+	, Lines(0)
 	, Score(0)
-	, m_gameStarted( false )
-	, m_gamePaused( false)
 {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	PrimaryActorTick.bCanEverTick = true;
@@ -78,9 +79,9 @@ void ATetrisGameMode::StartGame()
 		m_gameStarted = true;
 
 		m_players.Empty();
-		for (auto it = GetWorld()->GetPawnIterator(); it; ++it)
+		for( auto it = TActorIterator<APlayerPawn>( GetWorld() ); it; ++it )
 		{
-			if (APlayerPawn* playerPawn = Cast< APlayerPawn >(it->Get()))
+			if (APlayerPawn* playerPawn = *it)
 			{
 				m_players.Push(playerPawn);
 
