@@ -1,7 +1,6 @@
 # The Tetris Remaster
 
-Tetris game built in UE4 (currently v4.26).
-An effort to revamp and modernize The Tetris Master (http://www.oocities.org/hollywood/set/4295/guardian/tetris.htm).
+Tetris game built in UE4 (currently v4.26) in an effort to revamp and modernize The Tetris Master (https://github.com/amaiorano/TheTetrisMaster).
 
 Features:
 - Classic Single Player mode (http://tetris.wikia.com/wiki/Scoring)
