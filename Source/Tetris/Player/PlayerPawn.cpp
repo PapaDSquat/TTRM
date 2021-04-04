@@ -24,8 +24,6 @@ void APlayerPawn::BeginPlay()
 	m_gameMode->OnGameEvent().AddUObject(this, &APlayerPawn::OnGameEvent);
 
 	SetupBoard();
-
-	m_gameMode->StartGame();
 }
 
 void APlayerPawn::Tick(float DeltaTime)

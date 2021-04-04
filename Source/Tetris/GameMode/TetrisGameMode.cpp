@@ -31,6 +31,13 @@ void ATetrisGameMode::BeginPlay()
 	//Themes.LoadSynchronous();
 }
 
+void ATetrisGameMode::StartPlay()
+{
+	Super::StartPlay(); // Will call BeginPlay on GameMode and PlayerPawns
+
+	StartGame();
+}
+
 void ATetrisGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

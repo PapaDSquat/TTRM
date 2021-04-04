@@ -40,6 +40,7 @@ public:
 	ATetrisGameMode();
 	
 	virtual void BeginPlay() override;
+	virtual void StartPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	// Returns true if leveled up
