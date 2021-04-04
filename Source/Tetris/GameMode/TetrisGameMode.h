@@ -99,8 +99,8 @@ public:
 
 	// Returns true if theme was changed successfully
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
-	bool SetTheme(const FName& themeID);
-	bool SetTheme(const FTetrisTheme& theme, bool restart = true);
+	void SetTheme(const FName& themeID, bool restart = true);
+	void SetTheme(const FTetrisTheme& theme, bool restart = true);
 
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	const TArray<FTetrisTheme>& GetAllThemes() const;

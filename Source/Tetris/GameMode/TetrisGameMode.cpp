@@ -203,27 +203,26 @@ void ATetrisGameMode::SetNumPlayers(int32 num)
 	RestartGame();
 }
 
-bool ATetrisGameMode::SetTheme(const FName& themeID)
+void ATetrisGameMode::SetTheme(const FName& themeID, bool restart /*= true*/)
 {
 	if (Themes)
 	{
-		return SetTheme(Themes->GetTheme(themeID));
+		SetTheme(Themes->GetTheme(themeID), restart);
 	}
-	return false;
 }
 
-bool ATetrisGameMode::SetTheme(const FTetrisTheme& theme, bool restart /*= true*/)
+void ATetrisGameMode::SetTheme(const FTetrisTheme& theme, bool restart /*= true*/)
 {
 	if (m_currentTheme.ThemeID != theme.ThemeID)
 	{
 		m_currentTheme = theme;
 		GetTetrisGameInstance()->GetAudioManager()->SetMusic( m_currentTheme.Music );
 		OnThemeChange.Broadcast(m_currentTheme);
-		if(restart)
-			RestartGame();
-		return true;
 	}
-	return false;
+	if( restart )
+	{
+		RestartGame();
+	}
 }
 
 int32 ATetrisGameMode::GetPlayerLevel(APlayerPawn* playerPawn) const
