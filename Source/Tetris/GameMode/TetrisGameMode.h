@@ -116,6 +116,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tetris")
 	void SetNumPlayers(int32 num);
 
+	UPROPERTY( BlueprintReadOnly, Category = "Tetris" )
+	int32 StartingLevel;
+	UFUNCTION( BlueprintCallable, Category = "Tetris" )
+	void SetStartingLevel( int32 num ) { StartingLevel = num; }
+
 	// TODO: Multiple Players. Group stats into each.
 	UPROPERTY(BlueprintReadOnly, Category = "Tetris")
 	int32 Lines;

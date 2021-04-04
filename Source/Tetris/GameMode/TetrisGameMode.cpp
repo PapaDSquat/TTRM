@@ -92,7 +92,11 @@ void ATetrisGameMode::StartGame()
 			{
 				m_players.Push(playerPawn);
 
-				playerPawn->GetRoundStats().Reset();
+				FPlayerRoundStats& roundStats = playerPawn->GetRoundStats();
+				{
+					roundStats.Reset();
+					roundStats.Level = StartingLevel;
+				}
 			}
 		}
 
@@ -176,23 +180,23 @@ void ATetrisGameMode::SetNumPlayers(int32 num)
 {
 	const int32 currentNum = GetNumPlayers();
 	const int32 newNum = FMath::Max(1, num); // Minimum 1 player
-	if (currentNum == newNum)
-		return;
-
-	// Spawn new players
-	if (newNum > currentNum)
+	if( currentNum != newNum )
 	{
-		for (int32 i = currentNum; i < newNum; ++i)
+		// Spawn new players
+		if( newNum > currentNum )
 		{
-			UGameplayStatics::CreatePlayer(GetWorld(), i);
+			for( int32 i = currentNum; i < newNum; ++i )
+			{
+				UGameplayStatics::CreatePlayer( GetWorld(), i );
+			}
 		}
-	}
-	// Remove old players
-	else
-	{
-		for (int32 i = currentNum; i > newNum; --i)
+		// Remove old players
+		else
 		{
-			UGameplayStatics::RemovePlayer(UGameplayStatics::GetPlayerController(GetWorld(), i-1), true);
+			for( int32 i = currentNum; i > newNum; --i )
+			{
+				UGameplayStatics::RemovePlayer( UGameplayStatics::GetPlayerController( GetWorld(), i - 1 ), true );
+			}
 		}
 	}
 
